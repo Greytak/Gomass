@@ -1,0 +1,161 @@
+<!--<!DOCTYPE html> commented sinon bug-->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<!--<html>-->
+<head>
+  <meta charset="utf-8">
+  <title>Gomas</title>
+</head>
+<body><!--<body onload="allergo();"><input type="button"> -->
+</body>
+<script>
+//-----------------------------------------------------------
+var grillex = 8;
+var grilley = 4;
+var therequete = {};
+var canvas_source = "";
+var canvas_destination = "";
+//-----------------------------------------------------------
+create_canvas();
+create_buttons();
+//-----------------------------------------------------------
+goajaxrequete();
+//-----------------------------------------------------------
+//-----------------------------------------------------------
+function processajaxresponse() {
+  turnswap = document.getElementById("turnswap");
+  php_json = JSON.parse(tmpresp);
+  if (php_json["yourturn"]== 1) {
+    if (typeof myInterval != 'undefined')
+      clearInterval(myInterval);
+    turnswap.setAttribute("value", "fin de tour");
+    turnswap.disabled = false;
+  }
+  display();
+  if (php_json["yourturn"]== 0) {
+    if (typeof myInterval == 'undefined')
+      myInterval = setInterval ("goajaxrequete()", 750);
+    turnswap.setAttribute("value", "tour adverse");
+    turnswap.disabled = true;
+  }
+}
+//-----------------------------------------------------------
+function display() {
+  for (i = 0; i < grillex; i++) {
+    for (j = 0; j < grilley; j++) {
+      canvas_txt = "canvas"+i+"-"+j;
+      canvas_tmp = document.getElementById(canvas_txt);
+      canvas_tmp.clear();
+      if (php_json['grille'][i][j]['carte']==1) {
+        canvas_tmp.draw();
+      }
+    }
+  }
+}
+//-----------------------------------------------------------
+function create_canvas() {
+  for (i = 0; i < grillex; i++) {
+    for (j = 0; j < grilley; j++) {
+      var canvas = document.createElement('canvas');
+      canvas.id     = "canvas"+i+"-"+j;
+      canvas.width  = 100;
+      canvas.height = 150;
+      canvas.style.zIndex   = 8;
+      canvas.style.position = "absolute";
+      canvas.style.left = i*100;
+      canvas.style.top = j*150;
+      canvas.style.border = "1px solid grey";
+      canvas.x = i;
+      canvas.y = j;
+      canvas.imagej = new Image();
+      canvas.onclick = function() {
+        //if (this.imagej.src!='') {
+        if (php_json['grille'][this.x][this.y]['carte']==1) {
+          canvas_source= this.id;
+        }
+        else {
+          therequete["command"] = "gomove";
+          therequete["desx"] = this.x;
+          therequete["desy"] = this.y;
+          canvas_destination= this.id;
+          canvas_tmp = document.getElementById(canvas_source);
+          therequete["srcx"] = canvas_tmp.x;
+          therequete["srcy"] = canvas_tmp.y;
+          goajaxrequete();
+        }
+      };
+      canvas.clear = function() {
+        ctx = this.getContext("2d");
+        ctx.clearRect(0, 0, 100, 150);
+      };
+      canvas.draw = function() {
+        ctx = this.getContext("2d");
+        ctx.beginPath();
+        //ctx.fillStyle = "black";
+        ctx.rect(0, 0, 12, 12);
+        ctx.fillText(" 8", 0, 10);
+        ctx.fillText("Archimage", 22, 10);
+        ctx.rect(87, 138, 12, 12);
+        ctx.fillText(" 8", 87, 148);
+        ctx.rect(0, 138, 12, 12);
+        ctx.fillText(" 8", 0, 148);
+        ctx.fillText(" +1 dégats des sorts", 5, 100);
+        this.imagej.src = 'darth-vader.jpg';
+        ctx.drawImage(this.imagej, 10, 20, 75, 60);
+        ctx.stroke();
+        //ctx.fill();
+      };
+      document.body.appendChild(canvas);
+    }
+  }
+}
+//-----------------------------------------------------------
+function create_buttons() {
+  var element = document.createElement("input");
+  element.setAttribute("type", "button");
+  element.setAttribute("value", "-");
+  element.setAttribute("id", "turnswap");
+  element.style.position = "absolute";
+  element.style.left = 802;
+  element.style.top = 300;
+  element.onclick = function() {
+    therequete["command"] = "endturn";
+    goajaxrequete();
+  }
+
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.setAttribute("type", "button");
+  element.setAttribute("value", "reset");
+  element.setAttribute("id", "resetgame");
+  element.style.position = "absolute";
+  element.style.left = 802;
+  element.style.top = 270;
+  element.onclick = function() {
+    therequete["command"] = "resetgame";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+}
+//-----------------------------------------------------------
+function goajaxrequete()
+{
+  str_json= JSON.stringify(therequete);
+  console.log(str_json);
+  var xmlhttp=new XMLHttpRequest();
+  xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+      tmpresp= xmlhttp.responseText;
+      //console.log("tt--"+tmpresp+"--tt");
+      processajaxresponse();
+    } else {
+      //console.log('wrong');
+    }
+  }
+  xmlhttp.open("POST", "gomass.php", true)
+  xmlhttp.setRequestHeader("Content-type", "application/json")
+  xmlhttp.send(str_json);
+}
+//-----------------------------------------------------------
+//-----------------------------------------------------------
+</script>
+</html>
