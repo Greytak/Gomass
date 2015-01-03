@@ -2,7 +2,7 @@
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 global $grillex, $grilley, $onearray, $therequete;
-$grillex = 8;  $grilley = 4;
+$grillex = 8;  $grilley = 2;
 //-----------------------------------------------------------
 $str_json = file_get_contents('php://input');
 $therequete= json_decode($str_json, TRUE);
