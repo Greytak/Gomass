@@ -17,6 +17,8 @@ var canvas_destination = "";
 //-----------------------------------------------------------
 create_canvas();
 create_buttons();
+create_listeparties();
+create_buttons_partie();
 //-----------------------------------------------------------
 goajaxrequete();
 
@@ -27,11 +29,11 @@ function processajaxresponse() {
   turnswap = document.getElementById("turnswap");
   php_json = JSON.parse(tmpresp);
   if (php_json["yourturn"]== 1) {
-    turnswap.setAttribute("value", "fin de tour");
+    turnswap.setAttribute("value", "end of turn");
     turnswap.disabled = false;
   }
   if (php_json["yourturn"]== 0) {
-    turnswap.setAttribute("value", "tour adverse");
+    turnswap.setAttribute("value", "opponent turn");
     turnswap.disabled = true;
   }
   display();
@@ -111,27 +113,69 @@ function create_canvas() {
 //-----------------------------------------------------------
 function create_buttons() {
   var element = document.createElement("input");
-  element.setAttribute("type", "button");
-  element.setAttribute("value", "-");
-  element.setAttribute("id", "turnswap");
+  element.type = "button";
+  element.id = "turnswap";
   element.style.position = "absolute";
-  element.style.left = 802;
-  element.style.top = 300;
+  element.style.left = 60;
+  element.style.top = 303;
   element.onclick = function() {
     therequete["command"] = "endturn";
     goajaxrequete();
   }
-
   document.body.appendChild(element);
+
   var element = document.createElement("input");
-  element.setAttribute("type", "button");
-  element.setAttribute("value", "reset");
-  element.setAttribute("id", "resetgame");
+  element.type = "button";
+  element.value = "reset";
+  element.id = "resetgame";
   element.style.position = "absolute";
-  element.style.left = 802;
-  element.style.top = 270;
+  element.style.left = 3;
+  element.style.top = 303;
   element.onclick = function() {
     therequete["command"] = "resetgame";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+}
+//-----------------------------------------------------------
+function create_listeparties() {
+  var element = document.createElement("select");
+  element.style.position = "absolute";
+  element.style.left = 160;
+  element.style.top = 303;
+  //?element.textsize = 55;
+  var option1 = document.createElement("option");
+  option1.value="1";
+  option1.innerHTML="sample1";
+  element.appendChild(option1);
+  var option2 = document.createElement("option");
+  option2.value="2";
+  option2.innerHTML="sample2";
+  element.appendChild(option2);
+  document.body.appendChild(element);
+}
+function create_buttons_partie() {
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "join";
+  element.id = "joingame";
+  element.style.position = "absolute";
+  element.style.left = 270;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "joingame";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "create";
+  element.id = "creategame";
+  element.style.position = "absolute";
+  element.style.left = 310;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "creategame";
     goajaxrequete();
   }
   document.body.appendChild(element);
