@@ -3,7 +3,7 @@
 <!--<html>-->
 <head>
   <meta charset="utf-8">
-  <title>Gomas</title>
+  <title>Gomass</title>
 </head>
 <body><!--<body onload="allergo();"><input type="button"> -->
 </body>
@@ -19,24 +19,24 @@ create_canvas();
 create_buttons();
 //-----------------------------------------------------------
 goajaxrequete();
+
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 function processajaxresponse() {
+  therequete["command"] = "";
   turnswap = document.getElementById("turnswap");
   php_json = JSON.parse(tmpresp);
   if (php_json["yourturn"]== 1) {
-    if (typeof myInterval != 'undefined')
-      clearInterval(myInterval);
     turnswap.setAttribute("value", "fin de tour");
     turnswap.disabled = false;
   }
-  display();
   if (php_json["yourturn"]== 0) {
-    if (typeof myInterval == 'undefined')
-      myInterval = setInterval ("goajaxrequete()", 750);
     turnswap.setAttribute("value", "tour adverse");
     turnswap.disabled = true;
   }
+  display();
+  //if (typeof myInterval == 'undefined')
+  myTimeout = setTimeout ("goajaxrequete()", 750);
 }
 //-----------------------------------------------------------
 function display() {
@@ -139,6 +139,8 @@ function create_buttons() {
 //-----------------------------------------------------------
 function goajaxrequete()
 {
+  if (typeof myTimeout != 'undefined')
+    clearTimeout(myTimeout);
   str_json= JSON.stringify(therequete);
   console.log(str_json);
   var xmlhttp=new XMLHttpRequest();
