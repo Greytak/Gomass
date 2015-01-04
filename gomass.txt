@@ -1,0 +1,37 @@
+Gomass :
+--------------------------------------------
+setTimeout ("goajaxrequete()", 750);
+click destination => command move
+click end turn => command endturn
+click reset => command resetgame
+
+--------------------------------------------
+liste des parties -> joindre, créer partie -> créer
+
+--------------------------------------------
+Users : liste d'IDs
+Parties : ID_partie, ID_joueur1, ID_joueur2
+Partie : ID_partie, ID_joueur1, ID_joueur2, grille
+
+--------------------------------------------
+appel vide => authenticate user , liste parties
+joindre partie (ID_partie) => authenticate user , load/send partie
+action partie (ID_partie, src, dest) =>
+  authenticate user, load partie , action, save partie, send partie
+créer partie => authenticate user , créer partie, load/send partie
+
+--------------------------------------------
+liste parties : ID_joueur1==null OR ID_joueur1==ID_cookie OR ID_joueur2==null OR ID_joueur2==ID_cookie
+
+authenticate user :
+  foreach Users : if ID_joueur==ID_cookie OK else setcookie
+
+load partie(ID_partie) :
+  foreach partie :
+    if ID_partie==ID_partie if ID_joueur1==ID_cookie OR ID_joueur2==ID_cookie
+      jsondecode
+
+save partie : jsonencode
+
+send partie : jsonencode
+--------------------------------------------
