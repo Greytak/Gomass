@@ -1,3 +1,5 @@
+<?
+/*
 Gomass :
 --------------------------------------------
 setTimeout ("goajaxrequete()", 750);
@@ -14,7 +16,7 @@ Parties : ID_partie, ID_joueur1, ID_joueur2
 Partie : ID_partie, ID_joueur1, ID_joueur2, grille
 
 --------------------------------------------
-- load_Users "usersarray.json"
+- load_users "usersarray.json"
 - authenticate user
 - appel vide : liste parties
 - joindre partie (ID_partie) : load/send partie
@@ -22,8 +24,6 @@ Partie : ID_partie, ID_joueur1, ID_joueur2, grille
 - créer partie : créer partie, load/send partie
 
 --------------------------------------------
-load_Users : json_decode(file_get_contents("usersarray.json"), TRUE))
-
 authenticate user :
   foreach Users :
     if ID_joueur==ID_cookie OK else
@@ -41,3 +41,30 @@ save partie : jsonencode
 
 send partie : jsonencode
 --------------------------------------------
+*/
+//-----------------------------------------------------------
+//-----------------------------------------------------------
+function auth_user() {
+  global $usersarray;
+  if (isset($_COOKIE["idid"]))
+  if (isset($usersarray[$_COOKIE["idid"]])) {
+    //refresh date ?
+    return;
+  }
+  //file_put_contents ( "cookie.log" , $_COOKIE["idid"]);
+  $uniqidcook= uniqid('', true);
+  $usersarray[$uniqidcook]= "date";
+  setcookie("idid", $uniqidcook);
+}
+//-----------------------------------------------------------
+function load_users() {
+  global $usersarray;
+  if ($usersarray = json_decode(file_get_contents("usersarray.json"), TRUE)) {
+  } else {
+      $usersarray = array();
+    }
+}
+//-----------------------------------------------------------
+//-----------------------------------------------------------
+//-----------------------------------------------------------
+?>
