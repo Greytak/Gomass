@@ -170,12 +170,12 @@ function create_buttons_partie() {
   var element = document.createElement("input");
   element.type = "button";
   element.value = "create";
-  element.id = "creategame";
+  element.id = "createparty";
   element.style.position = "absolute";
   element.style.left = 310;
   element.style.top = 303;
   element.onclick = function() {
-    therequete["command"] = "creategame";
+    therequete["command"] = "createparty";
     goajaxrequete();
   }
   document.body.appendChild(element);
