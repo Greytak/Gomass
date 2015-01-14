@@ -1,0 +1,82 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Citron</title>
+</head>
+<body>
+</body>
+<script>
+//-----------------------------------------------------------
+var grillex = 8;
+var grilley = 4;
+var canvas_source = "";
+var canvas_destination = "";
+//-----------------------------------------------------------
+createAllCartes();
+displayAllCartes();
+//-----------------------------------------------------------
+//Declare the Carte prototype//
+function Carte(x, y) {
+  var Carte = document.createElement('canvas');
+  Carte.ctx = Carte.getContext("2d");
+  Carte.x = x;
+  Carte.y = y;
+  Carte.id = "carte" + x + "-" + y;
+  Carte.width = 100;
+  Carte.height = 150;
+  Carte.style.zIndex = 8;
+  Carte.style.position = "absolute";
+  Carte.style.left = x * 100;
+  Carte.style.top = y * 150;
+  Carte.style.border = "1px solid grey";
+  Carte.selected = false;
+  Carte.imagej = new Image();
+  Carte.onclick = function() {
+    if (this.selected == false) {
+      this.selected = true;
+    }
+    else {
+      this.selected = false;
+    }
+  };
+  Carte.clear = function() {
+    this.ctx.clearRect(0, 0, 100, 150);
+  };
+  Carte.draw = function(img) {
+    this.ctx.beginPath();
+    this.ctx.rect(0, 0, 12, 12);
+    this.ctx.fillText(" 8", 0, 10);
+    this.ctx.fillText("Archimage", 22, 10);
+    this.ctx.rect(87, 138, 12, 12);
+    this.ctx.fillText(" 8", 87, 148);
+    this.ctx.rect(0, 138, 12, 12);
+    this.ctx.fillText(" 8", 0, 148);
+    this.ctx.fillText(" +1 dégats des sorts", 5, 100);
+    this.imagej.src = img;
+    this.ctx.drawImage(this.imagej, 10, 20, 75, 60);
+    this.ctx.stroke();
+  };
+  return Carte;
+};
+//-----------------------------------------------------------
+function displayAllCartes() {
+  for (i = 0; i < grillex; i++) {
+    for (j = 0; j < grilley; j++) {
+      canvas_txt = "carte" + i + "-" + j;
+      canvas_tmp = document.getElementById(canvas_txt);
+      canvas_tmp.clear();
+      canvas_tmp.draw("darth-vader.jpg");
+    }
+  }
+}
+//-----------------------------------------------------------
+function createAllCartes() {
+  for (i = 0; i < grillex; i++) {
+    for (j = 0; j < grilley; j++) {
+      var carteInstance = Carte(i, j);
+      document.body.appendChild(carteInstance);
+    }
+  }
+}
+</script>
+</html>
