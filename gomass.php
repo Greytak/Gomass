@@ -12,13 +12,15 @@ list_parties();
 if (isset($therequete["command"]))
   call_user_func($therequete["command"]);
 //-----------------------------------------------------------
-$onearray= array();
-$onearray["partiesarray"]= $partiesarray;
-$onearray_json= json_encode($onearray);
+$array4js= array();
+$array4js["partiesarray"]= $partiesarray;
+$array4js_json= json_encode($array4js);
 header('Content-Type: application/json');
-echo $onearray_json;
+echo $array4js_json;
 //-----------------------------------------------------------
 //-----------------------------------------------------------
+function joinparty() {
+}
 //-----------------------------------------------------------
 function resetgame() {
   unlink("partiesarray.json");
@@ -27,13 +29,17 @@ function resetgame() {
 }
 //-----------------------------------------------------------
 function createparty() {
-  global $theparty, $usersarray;
+  global $theparty, $partiesarray, $usersarray;
   $theparty= array();
   $theparty["player1"]= $usersarray[$_COOKIE["idid"]];
   $uniqidparty= uniqid('', true);
   $theparty["id"]= $uniqidparty;
   $theparty_json= json_encode($theparty);
   file_put_contents("parties/".$uniqidparty.".json", $theparty_json);
+  $partiesarray[$uniqidparty]["id"]= $uniqidparty;
+  $partiesarray[$uniqidparty]["player1"]= $usersarray[$_COOKIE["idid"]];
+  $partiesarray_json= json_encode($partiesarray);
+  file_put_contents("partiesarray.json", $partiesarray_json);
 }
 //-----------------------------------------------------------
 //-----------------------------------------------------------

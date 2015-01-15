@@ -1,11 +1,9 @@
-<!--<!DOCTYPE html> commented sinon bug-->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
-<!--<html>-->
 <head>
   <meta charset="utf-8">
   <title>Gomass</title>
 </head>
-<body><!--<body onload="allergo();"><input type="button"> -->
+<body>
 </body>
 <script>
 //-----------------------------------------------------------
@@ -17,8 +15,8 @@ var canvas_destination = "";
 //-----------------------------------------------------------
 create_canvas();
 create_buttons();
-create_listeparties();
-create_buttons_partie();
+create_listparties();
+create_buttons_party();
 //-----------------------------------------------------------
 goajaxrequete();
 
@@ -36,8 +34,12 @@ function processajaxresponse() {
     turnswap.setAttribute("value", "opponent turn");
     turnswap.disabled = true;
   }
-  display();
+  //display();
   //if (typeof myInterval == 'undefined')
+  if (typeof php_json != 'undefined') {
+    if (typeof php_json['grille'] != 'undefined') display();
+    if (typeof php_json['partiesarray'] != 'undefined') fill_listparties();
+  }
   myTimeout = setTimeout ("goajaxrequete()", 750);
 }
 //-----------------------------------------------------------
@@ -52,6 +54,107 @@ function display() {
       }
     }
   }
+}
+//-----------------------------------------------------------
+function create_buttons() {
+  var element = document.createElement("input");
+  element.type = "button";
+  element.id = "turnswap";
+  element.style.position = "absolute";
+  element.style.left = 60;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "endturn";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "reset";
+  element.id = "resetgame";
+  element.style.position = "absolute";
+  element.style.left = 3;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "resetgame";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+}
+//-----------------------------------------------------------
+function create_listparties() {
+  var element = document.createElement("select");
+  element.id = "listparties";
+  element.style.position = "absolute";
+  element.style.left = 410;
+  element.style.top = 303;
+  //?element.textsize = 55;
+/*  var option2 = document.createElement("option");
+  option2.value="2";
+  option2.innerHTML="sample2";
+  element.appendChild(option2);*/
+  document.body.appendChild(element);
+}
+function fill_listparties() {  
+  var listparties = document.getElementById("listparties");
+  listparties.innerHTML = "";
+  if (typeof php_json['partiesarray'] != 'undefined') {//??
+    for (var key in php_json['partiesarray']) {
+      var value = php_json['partiesarray'][key];
+      var option = document.createElement("option");
+      option.value = value["id"];
+      option.innerHTML = value["id"];
+      listparties.appendChild(option);
+    }
+  }
+}
+function create_buttons_party() {
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "join";
+  element.id = "joinparty";
+  element.style.position = "absolute";
+  element.style.left = 270;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "joinparty";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "create";
+  element.id = "createparty";
+  element.style.position = "absolute";
+  element.style.left = 330;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "createparty";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+}
+//-----------------------------------------------------------
+function goajaxrequete()
+{
+  if (typeof myTimeout != 'undefined')
+    clearTimeout(myTimeout);
+  str_json= JSON.stringify(therequete);
+  console.log(str_json);
+  var xmlhttp=new XMLHttpRequest();
+  xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+      tmpresp= xmlhttp.responseText;
+      //console.log("tt--"+tmpresp+"--tt");
+      processajaxresponse();
+    } else {
+      //console.log('wrong');
+    }
+  }
+  xmlhttp.open("POST", "gomass.php", true)
+  xmlhttp.setRequestHeader("Content-type", "application/json")
+  xmlhttp.send(str_json);
 }
 //-----------------------------------------------------------
 function create_canvas() {
@@ -109,97 +212,6 @@ function create_canvas() {
       document.body.appendChild(canvas);
     }
   }
-}
-//-----------------------------------------------------------
-function create_buttons() {
-  var element = document.createElement("input");
-  element.type = "button";
-  element.id = "turnswap";
-  element.style.position = "absolute";
-  element.style.left = 60;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "endturn";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-
-  var element = document.createElement("input");
-  element.type = "button";
-  element.value = "reset";
-  element.id = "resetgame";
-  element.style.position = "absolute";
-  element.style.left = 3;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "resetgame";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-}
-//-----------------------------------------------------------
-function create_listeparties() {
-  var element = document.createElement("select");
-  element.style.position = "absolute";
-  element.style.left = 160;
-  element.style.top = 303;
-  //?element.textsize = 55;
-  var option1 = document.createElement("option");
-  option1.value="1";
-  option1.innerHTML="sample1";
-  element.appendChild(option1);
-  var option2 = document.createElement("option");
-  option2.value="2";
-  option2.innerHTML="sample2";
-  element.appendChild(option2);
-  document.body.appendChild(element);
-}
-function create_buttons_partie() {
-  var element = document.createElement("input");
-  element.type = "button";
-  element.value = "join";
-  element.id = "joingame";
-  element.style.position = "absolute";
-  element.style.left = 270;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "joingame";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-  var element = document.createElement("input");
-  element.type = "button";
-  element.value = "create";
-  element.id = "createparty";
-  element.style.position = "absolute";
-  element.style.left = 310;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "createparty";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-}
-//-----------------------------------------------------------
-function goajaxrequete()
-{
-  if (typeof myTimeout != 'undefined')
-    clearTimeout(myTimeout);
-  str_json= JSON.stringify(therequete);
-  console.log(str_json);
-  var xmlhttp=new XMLHttpRequest();
-  xmlhttp.onreadystatechange=function() {
-    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-      tmpresp= xmlhttp.responseText;
-      //console.log("tt--"+tmpresp+"--tt");
-      processajaxresponse();
-    } else {
-      //console.log('wrong');
-    }
-  }
-  xmlhttp.open("POST", "gomass.php", true)
-  xmlhttp.setRequestHeader("Content-type", "application/json")
-  xmlhttp.send(str_json);
 }
 //-----------------------------------------------------------
 //-----------------------------------------------------------
