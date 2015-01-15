@@ -1,25 +1,42 @@
 <?
 //-----------------------------------------------------------
 //-----------------------------------------------------------
-global $grillex, $grilley, $therequete;
+global $grillex, $grilley, $therequest, $array4js;
 global $usersarray, $partiesarray, $theparty;
 $grillex = 8;  $grilley = 2;
 $str_json = file_get_contents('php://input');
-$therequete= json_decode($str_json, TRUE);
+$therequest= json_decode($str_json, TRUE);
+$array4js= array();
 load_users();
 auth_user();
 list_parties();
-if (isset($therequete["command"]))
-  call_user_func($therequete["command"]);
+if (isset($therequest["command"]))
+  call_user_func($therequest["command"]);
 //-----------------------------------------------------------
-$array4js= array();
 $array4js["partiesarray"]= $partiesarray;
+if (isset($theparty)) $array4js["theparty"]= $theparty;
 $array4js_json= json_encode($array4js);
 header('Content-Type: application/json');
 echo $array4js_json;
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 function joinparty() {
+  global $theparty, $array4js;
+  if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
+  if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
+    $array4js["current_party"] = $therequest["selected_party"];
+    return;
+  }
+  if (!isset($theparty["player1"])) {
+    $theparty["player1"] = $_COOKIE["idid"];
+    $array4js["current_party"] = $therequest["selected_party"];
+    return;
+  }
+  if (!isset($theparty["player2"])) {
+    $theparty["player2"] = $_COOKIE["idid"];
+    $array4js["current_party"] = $therequest["selected_party"];
+    return;
+  }
 }
 //-----------------------------------------------------------
 function resetgame() {
@@ -29,7 +46,7 @@ function resetgame() {
 }
 //-----------------------------------------------------------
 function createparty() {
-  global $theparty, $partiesarray, $usersarray;
+  global $theparty, $partiesarray, $usersarray, $array4js;
   $theparty= array();
   $theparty["player1"]= $usersarray[$_COOKIE["idid"]];
   $uniqidparty= uniqid('', true);
@@ -40,6 +57,7 @@ function createparty() {
   $partiesarray[$uniqidparty]["player1"]= $usersarray[$_COOKIE["idid"]];
   $partiesarray_json= json_encode($partiesarray);
   file_put_contents("partiesarray.json", $partiesarray_json);
+  $array4js["current_party"] = $uniqidparty;
 }
 //-----------------------------------------------------------
 //-----------------------------------------------------------

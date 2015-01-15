@@ -9,10 +9,9 @@
 //-----------------------------------------------------------
 var grillex = 8;
 var grilley = 2;
-var therequete = {};
+var therequest = {};
 var canvas_source = "";
 var canvas_destination = "";
-var selected_party = "";
 //-----------------------------------------------------------
 create_canvas();
 create_buttons();
@@ -23,20 +22,22 @@ goajaxrequete();
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 function processajaxresponse() {
-  therequete["command"] = "";
+  therequest["command"] = "";
   turnswap = document.getElementById("turnswap");
   php_json = JSON.parse(tmpresp);
-  if (php_json["yourturn"]== 1) {
-    turnswap.setAttribute("value", "end of turn");
-    turnswap.disabled = false;
-  }
-  if (php_json["yourturn"]== 0) {
-    turnswap.setAttribute("value", "opponent turn");
-    turnswap.disabled = true;
-  }
-  if (typeof php_json != 'undefined') {
-    if (typeof php_json['grille'] != 'undefined') display();
-    if (typeof php_json['partiesarray'] != 'undefined') fill_listparties();
+  if (typeof php_json != "undefined") {
+    if (typeof php_json["current_party"] != 'undefined')
+      therequest['selected_party'] = php_json["current_party"];
+    if (php_json["yourturn"]== 1) {
+      turnswap.setAttribute("value", "end of turn");
+      turnswap.disabled = false;
+    }
+    if (php_json["yourturn"]== 0) {
+      turnswap.setAttribute("value", "opponent turn");
+      turnswap.disabled = true;
+    }
+    if (typeof php_json["grille"] != 'undefined') display();
+    if (typeof php_json["partiesarray"] != 'undefined') fill_listparties();
   }
   myTimeout = setTimeout ("goajaxrequete()", 750);
 }
@@ -61,10 +62,7 @@ function create_listparties() {
   element.style.left = 410;
   element.style.top = 303;
   element.onclick = function() {
-    selected_party = this[this.selectedIndex].value;
-    //console.log("click create_listparties"+this.selectedIndex);
-    //console.log(this[this.selectedIndex].value);
-    
+    therequest['selected_party'] = this[this.selectedIndex].value;
   };
   document.body.appendChild(element);
 }
@@ -76,7 +74,7 @@ function fill_listparties() {
     for (var key in php_json['partiesarray']) {
       var value = php_json['partiesarray'][key];
       var option = document.createElement("option");
-      if (selected_party==value["id"]) option.selected = true;
+      if (therequest['selected_party']==value["id"]) option.selected = true;
       option.value = value["id"];
       option.innerHTML = value["id"];
       listparties.appendChild(option);
@@ -88,7 +86,7 @@ function goajaxrequete()
 {
   if (typeof myTimeout != 'undefined')
     clearTimeout(myTimeout);
-  str_json= JSON.stringify(therequete);
+  str_json= JSON.stringify(therequest);
   console.log(str_json);
   var xmlhttp=new XMLHttpRequest();
   xmlhttp.onreadystatechange=function() {
@@ -126,13 +124,13 @@ function create_canvas() {
           canvas_source= this.id;
         }
         else {
-          therequete["command"] = "gomove";
-          therequete["desx"] = this.x;
-          therequete["desy"] = this.y;
+          therequest["command"] = "gomove";
+          therequest["desx"] = this.x;
+          therequest["desy"] = this.y;
           canvas_destination= this.id;
           canvas_tmp = document.getElementById(canvas_source);
-          therequete["srcx"] = canvas_tmp.x;
-          therequete["srcy"] = canvas_tmp.y;
+          therequest["srcx"] = canvas_tmp.x;
+          therequest["srcy"] = canvas_tmp.y;
           goajaxrequete();
         }
       };
@@ -170,7 +168,7 @@ function create_buttons() {
   element.style.left = 60;
   element.style.top = 303;
   element.onclick = function() {
-    therequete["command"] = "endturn";
+    therequest["command"] = "endturn";
     goajaxrequete();
   }
   document.body.appendChild(element);
@@ -182,7 +180,7 @@ function create_buttons() {
   element.style.left = 3;
   element.style.top = 303;
   element.onclick = function() {
-    therequete["command"] = "resetgame";
+    therequest["command"] = "resetgame";
     goajaxrequete();
   }
   document.body.appendChild(element);
@@ -197,7 +195,7 @@ function create_buttons_party() {
   element.style.left = 270;
   element.style.top = 303;
   element.onclick = function() {
-    therequete["command"] = "joinparty";
+    therequest["command"] = "joinparty";
     goajaxrequete();
   }
   document.body.appendChild(element);
@@ -209,7 +207,7 @@ function create_buttons_party() {
   element.style.left = 330;
   element.style.top = 303;
   element.onclick = function() {
-    therequete["command"] = "createparty";
+    therequest["command"] = "createparty";
     goajaxrequete();
   }
   document.body.appendChild(element);
