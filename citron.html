@@ -26,10 +26,15 @@ function Carte(x, y) {
   Carte.height = 150;
   Carte.style.zIndex = 8;
   Carte.style.position = "absolute";
-  Carte.style.left = x * 100;
-  Carte.style.top = y * 150;
+  Carte.style.left = x * Carte.width;
+  Carte.style.top = y * Carte.height;
   Carte.style.border = "1px solid grey";
   Carte.selected = false;
+  Carte.cout = " ";
+  Carte.attaque = " ";
+  Carte.defense = " ";
+  Carte.titre = "";
+  Carte.description = "";
   Carte.imagej = new Image();
   Carte.onclick = function() {
     if (this.selected == false) {
@@ -40,20 +45,21 @@ function Carte(x, y) {
     }
   };
   Carte.clear = function() {
-    this.ctx.clearRect(0, 0, 100, 150);
+    this.ctx.clearRect(0, 0, this.width, this.height);
   };
-  Carte.draw = function(img) {
+  Carte.draw = function(img, vie, att, def, titre, desc) {
+    carreCote = 12;
     this.ctx.beginPath();
-    this.ctx.rect(0, 0, 12, 12);
-    this.ctx.fillText(" 8", 0, 10);
-    this.ctx.fillText("Archimage", 22, 10);
-    this.ctx.rect(87, 138, 12, 12);
-    this.ctx.fillText(" 8", 87, 148);
-    this.ctx.rect(0, 138, 12, 12);
-    this.ctx.fillText(" 8", 0, 148);
-    this.ctx.fillText(" +1 dégats des sorts", 5, 100);
+    this.ctx.rect(0, 0, carreCote, carreCote);//haut gauche
+    this.ctx.fillText(vie, 0, carreCote-2);
+    this.ctx.fillText(titre, carreCote+2, carreCote-2);
+    this.ctx.rect(this.width-carreCote, this.height-carreCote, carreCote, carreCote);//bas droite
+    this.ctx.fillText(def, this.width-carreCote, this.height-2);
+    this.ctx.rect(0, this.height-carreCote, carreCote, carreCote);// bas gauche
+    this.ctx.fillText(att, 0, this.height-2);
+    this.ctx.fillText(desc, carreCote/2, this.height-(carreCote+2));
     this.imagej.src = img;
-    this.ctx.drawImage(this.imagej, 10, 20, 75, 60);
+    this.ctx.drawImage(this.imagej, carreCote+2, carreCote+2, this.width-2*(carreCote+2), this.height-3*(carreCote+2));
     this.ctx.stroke();
   };
   return Carte;
@@ -65,7 +71,7 @@ function displayAllCartes() {
       canvas_txt = "carte" + i + "-" + j;
       canvas_tmp = document.getElementById(canvas_txt);
       canvas_tmp.clear();
-      canvas_tmp.draw("darth-vader.jpg");
+      canvas_tmp.draw("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
     }
   }
 }
