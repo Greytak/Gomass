@@ -12,6 +12,7 @@ var grilley = 2;
 var therequete = {};
 var canvas_source = "";
 var canvas_destination = "";
+var selected_party = "";
 //-----------------------------------------------------------
 create_canvas();
 create_buttons();
@@ -19,7 +20,6 @@ create_listparties();
 create_buttons_party();
 //-----------------------------------------------------------
 goajaxrequete();
-
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 function processajaxresponse() {
@@ -34,8 +34,6 @@ function processajaxresponse() {
     turnswap.setAttribute("value", "opponent turn");
     turnswap.disabled = true;
   }
-  //display();
-  //if (typeof myInterval == 'undefined')
   if (typeof php_json != 'undefined') {
     if (typeof php_json['grille'] != 'undefined') display();
     if (typeof php_json['partiesarray'] != 'undefined') fill_listparties();
@@ -56,46 +54,21 @@ function display() {
   }
 }
 //-----------------------------------------------------------
-function create_buttons() {
-  var element = document.createElement("input");
-  element.type = "button";
-  element.id = "turnswap";
-  element.style.position = "absolute";
-  element.style.left = 60;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "endturn";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-
-  var element = document.createElement("input");
-  element.type = "button";
-  element.value = "reset";
-  element.id = "resetgame";
-  element.style.position = "absolute";
-  element.style.left = 3;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "resetgame";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-}
-//-----------------------------------------------------------
 function create_listparties() {
   var element = document.createElement("select");
   element.id = "listparties";
   element.style.position = "absolute";
   element.style.left = 410;
   element.style.top = 303;
-  //?element.textsize = 55;
-/*  var option2 = document.createElement("option");
-  option2.value="2";
-  option2.innerHTML="sample2";
-  element.appendChild(option2);*/
+  element.onclick = function() {
+    selected_party = this[this.selectedIndex].value;
+    //console.log("click create_listparties"+this.selectedIndex);
+    //console.log(this[this.selectedIndex].value);
+    
+  };
   document.body.appendChild(element);
 }
+//-----------------------------------------------------------
 function fill_listparties() {  
   var listparties = document.getElementById("listparties");
   listparties.innerHTML = "";
@@ -103,37 +76,12 @@ function fill_listparties() {
     for (var key in php_json['partiesarray']) {
       var value = php_json['partiesarray'][key];
       var option = document.createElement("option");
+      if (selected_party==value["id"]) option.selected = true;
       option.value = value["id"];
       option.innerHTML = value["id"];
       listparties.appendChild(option);
     }
   }
-}
-function create_buttons_party() {
-  var element = document.createElement("input");
-  element.type = "button";
-  element.value = "join";
-  element.id = "joinparty";
-  element.style.position = "absolute";
-  element.style.left = 270;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "joinparty";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-  var element = document.createElement("input");
-  element.type = "button";
-  element.value = "create";
-  element.id = "createparty";
-  element.style.position = "absolute";
-  element.style.left = 330;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequete["command"] = "createparty";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
 }
 //-----------------------------------------------------------
 function goajaxrequete()
@@ -214,6 +162,58 @@ function create_canvas() {
   }
 }
 //-----------------------------------------------------------
+function create_buttons() {
+  var element = document.createElement("input");
+  element.type = "button";
+  element.id = "turnswap";
+  element.style.position = "absolute";
+  element.style.left = 60;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "endturn";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "reset";
+  element.id = "resetgame";
+  element.style.position = "absolute";
+  element.style.left = 3;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "resetgame";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+}
+//-----------------------------------------------------------
+function create_buttons_party() {
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "join";
+  element.id = "joinparty";
+  element.style.position = "absolute";
+  element.style.left = 270;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "joinparty";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "create";
+  element.id = "createparty";
+  element.style.position = "absolute";
+  element.style.left = 330;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequete["command"] = "createparty";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+}
 //-----------------------------------------------------------
 </script>
 </html>
