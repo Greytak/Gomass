@@ -59,7 +59,7 @@ function create_listparties() {
   var element = document.createElement("select");
   element.id = "listparties";
   element.style.position = "absolute";
-  element.style.left = 410;
+  element.style.left = 480;
   element.style.top = 303;
   element.onclick = function() {
     therequest['selected_party'] = this[this.selectedIndex].value;
@@ -208,6 +208,18 @@ function create_buttons_party() {
   element.style.top = 303;
   element.onclick = function() {
     therequest["command"] = "createparty";
+    goajaxrequete();
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "quit";
+  element.id = "quitparty";
+  element.style.position = "absolute";
+  element.style.left = 410;
+  element.style.top = 303;
+  element.onclick = function() {
+    therequest["command"] = "quitparty";
     goajaxrequete();
   }
   document.body.appendChild(element);
