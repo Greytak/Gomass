@@ -29,6 +29,7 @@ header('Content-Type: application/json');
 echo $array4js_json;
 //-----------------------------------------------------------
 //-----------------------------------------------------------
+
 function joinparty() {
   global $theparty, $array4js, $therequest;
   if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
