@@ -3,7 +3,7 @@
 //-----------------------------------------------------------
 global $grillex, $grilley, $therequest, $array4js;
 global $usersarray, $partiesarray, $theparty, $debug;
-$grillex = 8;  $grilley = 2;
+$grillex = 8;  $grilley = 2;  $debug = '';
 $str_json = file_get_contents('php://input');
 $therequest= json_decode($str_json, TRUE);
 $array4js= array();
@@ -23,7 +23,8 @@ if (isset($theparty)) {
   file_put_contents("parties/".$theparty["id"].".json", $theparty_json);
 }
 //-----------------------------------------------------------
-//$array4js["debug"]= $debug;
+if ($therequest["command"]=='joinparty')
+  file_put_contents("debug", $debug);//$array4js["debug"]= $debug;
 //-----------------------------------------------------------
 $array4js_json= json_encode($array4js);
 header('Content-Type: application/json');
@@ -40,8 +41,9 @@ function gomove() {
 }
 //-----------------------------------------------------------
 function loadparty() {
-  global $theparty, $array4js, $therequest;
+  global $theparty, $array4js, $therequest, $debug;
   if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
+  //$debug.= '+'.$theparty["player1"].'+'.$theparty["player2"].'+';
   if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
     $array4js["current_party"] = $therequest["selected_party"];
     return;
@@ -49,23 +51,25 @@ function loadparty() {
 }
 //-----------------------------------------------------------
 function joinparty() {
+  global $theparty, $array4js, $therequest, $partiesarray, $debug;
+  //$debug.= "-joinparty-";
   loadparty();
-  global $theparty, $array4js, $therequest;
-  /*if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
-  if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
-    $array4js["current_party"] = $therequest["selected_party"];
-    return;
-  }*/
   if (!isset($theparty["player1"])) {
     $theparty["player1"] = $_COOKIE["idid"];
+    $partiesarray[$theparty["id"]]["player1"]= $_COOKIE["idid"];
     $array4js["current_party"] = $therequest["selected_party"];
+    //$debug.= "player1";
     return;
   }
+  //$debug.= '-'.$theparty["player1"].'-';
   if (!isset($theparty["player2"])) {
     $theparty["player2"] = $_COOKIE["idid"];
+    $partiesarray[$theparty["id"]]["player2"]= $_COOKIE["idid"];
     $array4js["current_party"] = $therequest["selected_party"];
+    //$debug.= "player2";
     return;
   }
+  //$debug.= '-'.$theparty["player2"].'-';
 }
 //-----------------------------------------------------------
 function resetgame() {
