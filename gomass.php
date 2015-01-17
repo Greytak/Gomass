@@ -2,7 +2,7 @@
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 global $grillex, $grilley, $therequest, $array4js;
-global $usersarray, $partiesarray, $theparty;
+global $usersarray, $partiesarray, $theparty, $debug;
 $grillex = 8;  $grilley = 2;
 $str_json = file_get_contents('php://input');
 $therequest= json_decode($str_json, TRUE);
@@ -12,31 +12,50 @@ auth_user();
 list_parties();
 if (isset($therequest["command"])) if ($therequest["command"]!='')
   call_user_func($therequest["command"]);
-/*if (isset($therequest["command"])) if ($therequest["command"]!='')
-if ($therequest["command"]=='resetgame') {
-  $partiesarray_json= json_encode($partiesarray);
-  file_put_contents("rrr", $partiesarray_json);
-}*/
 //-----------------------------------------------------------
 $partiesarray_json= json_encode($partiesarray);
 file_put_contents("partiesarray.json", $partiesarray_json);
-//-----------------------------------------------------------
 $array4js["partiesarray"]= $partiesarray;
-if (isset($theparty)) $array4js["theparty"]= $theparty;
+//-----------------------------------------------------------
+if (isset($theparty)) {
+  $array4js["theparty"]= $theparty;
+  $theparty_json= json_encode($theparty);
+  file_put_contents("parties/".$theparty["id"].".json", $theparty_json);
+}
+//-----------------------------------------------------------
+//$array4js["debug"]= $debug;
 //-----------------------------------------------------------
 $array4js_json= json_encode($array4js);
 header('Content-Type: application/json');
 echo $array4js_json;
 //-----------------------------------------------------------
 //-----------------------------------------------------------
-
-function joinparty() {
+function gomove() {
+  loadparty();
+  global $theparty, $array4js, $therequest;
+  if (isset($therequest["srcx"]) && isset($therequest["srcy"]) && isset($therequest["desx"]) && isset($therequest["desy"])) {
+    $theparty['grille'][intval($therequest["srcx"])][intval($therequest["srcy"])]['carte']= 0;
+    $theparty['grille'][intval($therequest["desx"])][intval($therequest["desy"])]['carte']= 1;
+  }
+}
+//-----------------------------------------------------------
+function loadparty() {
   global $theparty, $array4js, $therequest;
   if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
   if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
     $array4js["current_party"] = $therequest["selected_party"];
     return;
   }
+}
+//-----------------------------------------------------------
+function joinparty() {
+  loadparty();
+  global $theparty, $array4js, $therequest;
+  /*if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
+  if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
+    $array4js["current_party"] = $therequest["selected_party"];
+    return;
+  }*/
   if (!isset($theparty["player1"])) {
     $theparty["player1"] = $_COOKIE["idid"];
     $array4js["current_party"] = $therequest["selected_party"];
@@ -50,32 +69,38 @@ function joinparty() {
 }
 //-----------------------------------------------------------
 function resetgame() {
-  //global $partiesarray;
   unlink("partiesarray.json");
   unlink("usersarray.json");
   array_map('unlink', glob("parties/*.json"));
-  unset($GLOBALS['partiesarray']);
-  //unset($partiesarray);
-  //ok touch('rrr');
-  //$partiesarray_json= json_encode($partiesarray);
-  //file_put_contents("rrr", $partiesarray_json);
+  //use GLOBALS otherwise partiesarray is not unset outside of this function
+  unset($GLOBALS['partiesarray']); 
 }
 //-----------------------------------------------------------
 function quitparty() {
-  global $therequest;//, $partiesarray;
+  global $therequest;
   unlink("parties/".$therequest["selected_party"].".json");
+  //use GLOBALS otherwise partiesarray is not unset outside of this function
   unset($GLOBALS['partiesarray'][$therequest["selected_party"]]);
-  //unset($partiesarray[$uniqidparty]);  
 }
 //-----------------------------------------------------------
 function createparty() {
   global $theparty, $partiesarray, $usersarray, $array4js;
+  global $grillex, $grilley;
   $theparty= array();
-  $theparty["player1"]= $_COOKIE["idid"];
   $uniqidparty= uniqid('', true);
   $theparty["id"]= $uniqidparty;
-  $theparty_json= json_encode($theparty);
-  file_put_contents("parties/".$uniqidparty.".json", $theparty_json);
+  $theparty["player1"]= $_COOKIE["idid"];
+  $theparty["turnid"]= $_COOKIE["idid"];
+  for ($i = 0; $i < $grillex; $i++) {
+    for ($j = 0; $j < $grilley; $j++) {
+      $theparty['grille'][$i][$j]['carte']= 0;
+    }
+  }
+  $theparty['grille'][0][0]['carte']= 1;
+  $theparty['grille'][1][1]['carte']= 1;
+  $theparty['grille'][2][1]['carte']= 1;  
+  //$theparty_json= json_encode($theparty);
+  //file_put_contents("parties/".$uniqidparty.".json", $theparty_json);
   $partiesarray[$uniqidparty]["id"]= $uniqidparty;
   $partiesarray[$uniqidparty]["player1"]= $_COOKIE["idid"];
   $array4js["current_party"] = $uniqidparty;
@@ -136,7 +161,7 @@ Partie : ID_partie, ID_joueur1, ID_joueur2, grille
 - load_users "usersarray.json"
 - authenticate user
 - appel vide : liste parties
-- joindre partie (ID_partie) : load/send partie
+- joindre/vérif partie (ID_partie) : load/send partie
 - action partie (ID_partie, src, dest) : load partie , action, save partie, send partie
 - créer partie : créer partie, load/send partie
 

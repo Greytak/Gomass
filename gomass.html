@@ -22,12 +22,14 @@ goajaxrequete();
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 function processajaxresponse() {
-  therequest["command"] = "";
+  therequest["command"] = "";//? normally there is no Timeout anymore
   turnswap = document.getElementById("turnswap");
   php_json = JSON.parse(tmpresp);
   if (typeof php_json != "undefined") {
-    if (typeof php_json["current_party"] != 'undefined')
+    if (typeof php_json["current_party"] != 'undefined') {
       therequest['selected_party'] = php_json["current_party"];
+      therequest["command"] = "loadparty";
+    }
     if (php_json["yourturn"]== 1) {
       turnswap.setAttribute("value", "end of turn");
       turnswap.disabled = false;
@@ -36,10 +38,13 @@ function processajaxresponse() {
       turnswap.setAttribute("value", "opponent turn");
       turnswap.disabled = true;
     }
-    if (typeof php_json["grille"] != 'undefined') display();
+    if (typeof php_json["theparty"] != 'undefined') 
+      if (typeof php_json["theparty"]["grille"] != 'undefined') display();
     if (typeof php_json["partiesarray"] != 'undefined') fill_listparties();
   }
+  //if (typeof php_json["debug"] != 'undefined') if (php_json["debug"] == '') 
   myTimeout = setTimeout ("goajaxrequete()", 750);
+  //if (php_json["debug"] == '') myTimeout = setTimeout ("goajaxrequete()", 750);
 }
 //-----------------------------------------------------------
 function display() {
@@ -48,7 +53,7 @@ function display() {
       canvas_txt = "canvas"+i+"-"+j;
       canvas_tmp = document.getElementById(canvas_txt);
       canvas_tmp.clear();
-      if (php_json['grille'][i][j]['carte']==1) {
+      if (php_json["theparty"]['grille'][i][j]['carte']==1) {
         canvas_tmp.draw();
       }
     }
@@ -120,7 +125,7 @@ function create_canvas() {
       canvas.imagej = new Image();
       canvas.onclick = function() {
         //if (this.imagej.src!='') {
-        if (php_json['grille'][this.x][this.y]['carte']==1) {
+        if (php_json["theparty"]['grille'][this.x][this.y]['carte']==1) {
           canvas_source= this.id;
         }
         else {
