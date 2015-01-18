@@ -11,78 +11,93 @@ var grillex = 8;
 var grilley = 4;
 var canvas_source = "";
 var canvas_destination = "";
+var allCarte = new Array();
 //-----------------------------------------------------------
 createAllCartes();
 displayAllCartes();
 //-----------------------------------------------------------
 //Declare the Carte prototype//
 function Carte(x, y) {
-  var Carte = document.createElement('canvas');
-  Carte.ctx = Carte.getContext("2d");
-  Carte.x = x;
-  Carte.y = y;
-  Carte.id = "carte" + x + "-" + y;
-  Carte.width = 100;
-  Carte.height = 150;
-  Carte.style.zIndex = 8;
-  Carte.style.position = "absolute";
-  Carte.style.left = x * Carte.width;
-  Carte.style.top = y * Carte.height;
-  Carte.style.border = "1px solid grey";
-  Carte.selected = false;
-  Carte.cout = " ";
-  Carte.attaque = " ";
-  Carte.defense = " ";
-  Carte.titre = "";
-  Carte.description = "";
-  Carte.imagej = new Image();
-  Carte.onclick = function() {
+  this.x = x;
+  this.y = y;
+  this.canvas = document.createElement('canvas');
+  this.ctx = this.canvas.getContext("2d");
+  this.canvas.id = "carte" + this.x + "-" + this.y;
+  this.canvas.width = 100;
+  this.canvas.height = 150;
+  this.canvas.style.zIndex = 8;
+  this.canvas.style.position = "absolute";
+  this.canvas.style.left = this.x * this.canvas.width;
+  this.canvas.style.top = this.y * this.canvas.height;
+  this.canvas.style.border = "1px solid grey";
+  this.selected = false;
+  this.cout = "";
+  this.attaque = "";
+  this.defense = "";
+  this.titre = "";
+  this.description = "";
+  this.imagej = new Image();
+  this.init = function(img, cout, att, def, titre, desc) {
+    this.imagej.src = img;
+    this.cout = cout;
+    this.attaque = att;
+    this.defense = def;
+    this.titre = titre;
+    this.description = desc;
+  };
+  // surcharge de la methode onclick du canvas
+  this.canvas.onclick = function() {
     if (this.selected == false) {
       this.selected = true;
     }
     else {
       this.selected = false;
     }
+    console.log("selected : " + this.selected);
   };
-  Carte.clear = function() {
+  this.clear = function() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   };
-  Carte.draw = function(img, vie, att, def, titre, desc) {
+  this.draw = function() {
     carreCote = 12;
     this.ctx.beginPath();
     this.ctx.rect(0, 0, carreCote, carreCote);//haut gauche
-    this.ctx.fillText(vie, 0, carreCote-2);
-    this.ctx.fillText(titre, carreCote+2, carreCote-2);
-    this.ctx.rect(this.width-carreCote, this.height-carreCote, carreCote, carreCote);//bas droite
-    this.ctx.fillText(def, this.width-carreCote, this.height-2);
-    this.ctx.rect(0, this.height-carreCote, carreCote, carreCote);// bas gauche
-    this.ctx.fillText(att, 0, this.height-2);
-    this.ctx.fillText(desc, carreCote/2, this.height-(carreCote+2));
-    this.imagej.src = img;
-    this.ctx.drawImage(this.imagej, carreCote+2, carreCote+2, this.width-2*(carreCote+2), this.height-3*(carreCote+2));
+    this.ctx.fillText(this.cout, 0, carreCote-2);
+    this.ctx.fillText(this.titre, carreCote+2, carreCote-2);
+    this.ctx.rect(this.canvas.width-carreCote, this.canvas.height-carreCote, carreCote, carreCote);//bas droite
+    this.ctx.fillText(this.defense, this.canvas.width-carreCote, this.canvas.height-2);
+    this.ctx.rect(0, this.canvas.height-carreCote, carreCote, carreCote);// bas gauche
+    this.ctx.fillText(this.attaque, 0, this.canvas.height-2);
+    this.ctx.fillText(this.description, carreCote/2, this.canvas.height-(carreCote+2));
+    this.ctx.drawImage(this.imagej, carreCote+2, carreCote+2, this.canvas.width-2*(carreCote+2), this.canvas.height-3*(carreCote+2));
     this.ctx.stroke();
   };
-  return Carte;
-};
+  this.toString = function() {
+    console.log("x : " + this.x + " - " + "y : " + this.y + " - " + "canvas : " + this.canvas + " - " + "ctx : " + this.ctx + " - " + "id : " + this.canvas.id + 
+                " - " + "selected : " + this.selected + " - " + "cout : " + this.cout + " - " + "attaque: " + this.attaque + " - " + "defense: " + this.defense
+                 + " - " + "titre: " + this.titre + " - " + "description: " + this.description + " - " + "image: " + this.imagej.src);
+  };
+}
 //-----------------------------------------------------------
 function displayAllCartes() {
-  for (i = 0; i < grillex; i++) {
-    for (j = 0; j < grilley; j++) {
-      canvas_txt = "carte" + i + "-" + j;
-      canvas_tmp = document.getElementById(canvas_txt);
-      canvas_tmp.clear();
-      canvas_tmp.draw("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-    }
+  for (i = 0; i < (grillex*grilley); i++) {
+    allCarte[i].clear();
+    allCarte[i].draw();
+    //allCarte[i].toString();
   }
 }
 //-----------------------------------------------------------
 function createAllCartes() {
   for (i = 0; i < grillex; i++) {
     for (j = 0; j < grilley; j++) {
-      var carteInstance = Carte(i, j);
-      document.body.appendChild(carteInstance);
+      console.log(i + " " + j);
+      var carteInstance = new Carte(i, j);
+      carteInstance.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+      allCarte.push(carteInstance);
+      document.body.appendChild(carteInstance.canvas);
     }
   }
 }
+
 </script>
 </html>
