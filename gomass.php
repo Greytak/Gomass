@@ -23,13 +23,23 @@ if (isset($theparty)) {
   file_put_contents("parties/".$theparty["id"].".json", $theparty_json);
 }
 //-----------------------------------------------------------
-if ($therequest["command"]=='joinparty')
-  file_put_contents("debug", $debug);//$array4js["debug"]= $debug;
+//if ($therequest["command"]=='joinparty')
+//  file_put_contents("debug", $debug);//$array4js["debug"]= $debug;
 //-----------------------------------------------------------
 $array4js_json= json_encode($array4js);
 header('Content-Type: application/json');
 echo $array4js_json;
 //-----------------------------------------------------------
+//-----------------------------------------------------------
+function endturn() {
+  loadparty();
+  global $theparty, $array4js;
+  $array4js["yourturn"] = 0;
+  if ($theparty["player1"] == $_COOKIE["idid"])
+    $theparty["turnid"]= $theparty["player2"];
+  else
+    $theparty["turnid"]= $theparty["player1"];
+}
 //-----------------------------------------------------------
 function gomove() {
   loadparty();
@@ -40,20 +50,11 @@ function gomove() {
   }
 }
 //-----------------------------------------------------------
-function loadparty() {
-  global $theparty, $array4js, $therequest, $debug;
-  if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
-  //$debug.= '+'.$theparty["player1"].'+'.$theparty["player2"].'+';
-  if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
-    $array4js["current_party"] = $therequest["selected_party"];
-    return;
-  }
-}
-//-----------------------------------------------------------
 function joinparty() {
   global $theparty, $array4js, $therequest, $partiesarray, $debug;
   //$debug.= "-joinparty-";
   loadparty();
+  $array4js["yourturn"] = 0;
   if (!isset($theparty["player1"])) {
     $theparty["player1"] = $_COOKIE["idid"];
     $partiesarray[$theparty["id"]]["player1"]= $_COOKIE["idid"];
@@ -70,6 +71,20 @@ function joinparty() {
     return;
   }
   //$debug.= '-'.$theparty["player2"].'-';
+}
+//-----------------------------------------------------------
+function loadparty() {
+  global $theparty, $array4js, $therequest, $debug;
+  if ($theparty = json_decode(file_get_contents("parties/".$therequest["selected_party"].".json"), TRUE)) {} else return;
+  //$debug.= '+'.$theparty["player1"].'+'.$theparty["player2"].'+';
+  if (($theparty["player1"]==$_COOKIE["idid"]) or ($theparty["player2"]==$_COOKIE["idid"])) {
+    $array4js["current_party"] = $therequest["selected_party"];    
+    if ($theparty["turnid"] == $_COOKIE["idid"])
+      $array4js["yourturn"] = 1;
+    else
+      $array4js["yourturn"] = 0;
+    return;
+  }
 }
 //-----------------------------------------------------------
 function resetgame() {
@@ -108,6 +123,7 @@ function createparty() {
   $partiesarray[$uniqidparty]["id"]= $uniqidparty;
   $partiesarray[$uniqidparty]["player1"]= $_COOKIE["idid"];
   $array4js["current_party"] = $uniqidparty;
+  $array4js["yourturn"] = 1;
 }
 //-----------------------------------------------------------
 //-----------------------------------------------------------
