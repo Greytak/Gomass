@@ -1,6 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
 <head>
   <meta charset="utf-8">
+  <script type="text/javascript" src="pomme.js"></script>
   <title>Citron</title>
 </head>
 <body>
@@ -11,93 +12,63 @@ var grillex = 8;
 var grilley = 4;
 var canvas_source = "";
 var canvas_destination = "";
-var allCarte = new Array();
+var allCases = new Array();
 //-----------------------------------------------------------
-createAllCartes();
+//createAllCases();
+//createAllEmplacements();
+createAllCases2();
 displayAllCartes();
-//-----------------------------------------------------------
-//Declare the Carte prototype//
-function Carte(x, y) {
-  this.x = x;
-  this.y = y;
-  this.canvas = document.createElement('canvas');
-  this.ctx = this.canvas.getContext("2d");
-  this.canvas.id = "carte" + this.x + "-" + this.y;
-  this.canvas.width = 100;
-  this.canvas.height = 150;
-  this.canvas.style.zIndex = 8;
-  this.canvas.style.position = "absolute";
-  this.canvas.style.left = this.x * this.canvas.width;
-  this.canvas.style.top = this.y * this.canvas.height;
-  this.canvas.style.border = "1px solid grey";
-  this.selected = false;
-  this.cout = "";
-  this.attaque = "";
-  this.defense = "";
-  this.titre = "";
-  this.description = "";
-  this.imagej = new Image();
-  this.init = function(img, cout, att, def, titre, desc) {
-    this.imagej.src = img;
-    this.cout = cout;
-    this.attaque = att;
-    this.defense = def;
-    this.titre = titre;
-    this.description = desc;
-  };
-  // surcharge de la methode onclick du canvas
-  this.canvas.onclick = function() {
-    if (this.selected == false) {
-      this.selected = true;
-    }
-    else {
-      this.selected = false;
-    }
-    console.log("selected : " + this.selected);
-  };
-  this.clear = function() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-  };
-  this.draw = function() {
-    carreCote = 12;
-    this.ctx.beginPath();
-    this.ctx.rect(0, 0, carreCote, carreCote);//haut gauche
-    this.ctx.fillText(this.cout, 0, carreCote-2);
-    this.ctx.fillText(this.titre, carreCote+2, carreCote-2);
-    this.ctx.rect(this.canvas.width-carreCote, this.canvas.height-carreCote, carreCote, carreCote);//bas droite
-    this.ctx.fillText(this.defense, this.canvas.width-carreCote, this.canvas.height-2);
-    this.ctx.rect(0, this.canvas.height-carreCote, carreCote, carreCote);// bas gauche
-    this.ctx.fillText(this.attaque, 0, this.canvas.height-2);
-    this.ctx.fillText(this.description, carreCote/2, this.canvas.height-(carreCote+2));
-    this.ctx.drawImage(this.imagej, carreCote+2, carreCote+2, this.canvas.width-2*(carreCote+2), this.canvas.height-3*(carreCote+2));
-    this.ctx.stroke();
-  };
-  this.toString = function() {
-    console.log("x : " + this.x + " - " + "y : " + this.y + " - " + "canvas : " + this.canvas + " - " + "ctx : " + this.ctx + " - " + "id : " + this.canvas.id + 
-                " - " + "selected : " + this.selected + " - " + "cout : " + this.cout + " - " + "attaque: " + this.attaque + " - " + "defense: " + this.defense
-                 + " - " + "titre: " + this.titre + " - " + "description: " + this.description + " - " + "image: " + this.imagej.src);
-  };
-}
 //-----------------------------------------------------------
 function displayAllCartes() {
   for (i = 0; i < (grillex*grilley); i++) {
-    allCarte[i].clear();
-    allCarte[i].draw();
-    //allCarte[i].toString();
+    allCases[i].clear();
+    allCases[i].draw();
+    // log all
+    console.log(allCases[i].toString());
   }
 }
 //-----------------------------------------------------------
-function createAllCartes() {
-  for (i = 0; i < grillex; i++) {
-    for (j = 0; j < grilley; j++) {
-      console.log(i + " " + j);
-      var carteInstance = new Carte(i, j);
-      carteInstance.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-      allCarte.push(carteInstance);
-      document.body.appendChild(carteInstance.canvas);
+function createAllCases() {
+  for (x = 0; x < grillex; x++) {
+    for (y = 0; y < grilley; y++) {
+      var caseInstance = new Case(x, y);
+      console.log(caseInstance.toString());
+      // only first and last line have carte
+      if (y == 0 || y == 3) {
+        caseInstance.carte.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+      }
+      allCases.push(caseInstance);
+      document.body.appendChild(caseInstance.canvas);
     }
   }
 }
-
+function createAllEmplacements() {
+  for (x = 0; x < grillex; x++) {
+    for (y = 0; y < grilley; y++) {
+      var emplacementInstance = newEmplacement(x, y);
+      console.log(emplacementInstance.toString());
+      // only first and last line have carte
+      if (y == 0 || y == 3) {
+        emplacementInstance.carte.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+      }
+      allCases.push(emplacementInstance);
+      document.body.appendChild(emplacementInstance);
+    }
+  }
+}
+function createAllCases2() {
+  for (x = 0; x < grillex; x++) {
+    for (y = 0; y < grilley; y++) {
+      var case2Instance = new Case2(x, y);
+      console.log(case2Instance.toString());
+      // only first and last line have carte
+      if (y == 0 || y == 3) {
+        case2Instance.carte.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+      }
+      allCases.push(case2Instance);
+      document.body.appendChild(case2Instance.canvas);
+    }
+  }
+}
 </script>
 </html>
