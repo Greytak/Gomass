@@ -1,73 +1,73 @@
-/* Same as Case but with a new canvas.
- * See createAllCases2() function.
+/* Same as CaseTst but with a new canvas.
+ * See createAllCases() function.
 */
-function CanvasCarte(x, y) {
-  canvas = document.createElement('canvas');
-  canvas.id = "case" + x + "-" + y;
-  canvas.width = 100;
-  canvas.height = 150;
-  canvas.style.zIndex = 8;
-  canvas.style.position = "absolute";
-  canvas.style.left = x * canvas.width;
-  canvas.style.top = y * canvas.height;
-  canvas.style.border = "1px solid grey";
-  canvas.isSelect = false;
-  // overwrite canvas onclick method
-  canvas.onclick = function() {
-    if (this.isSelect == false) {
-      this.isSelect = true;
-      console.log(this.id + " selected!");
+var mouvementCarte = new Array();
+function Case(x, y) {
+  canvasCase = document.createElement('canvas');
+  // new properties
+  canvasCase.x = x;
+  canvasCase.y = y;
+  canvasCase.carte = new Carte(x + y);
+  // overwrite canvas properties
+  canvasCase.ctx = canvasCase.getContext("2d");
+  canvasCase.id = "case" + x + "-" + y;
+  canvasCase.width = 100;
+  canvasCase.height = 150;
+  canvasCase.style.zIndex = 8;
+  canvasCase.style.position = "absolute";
+  canvasCase.style.left = x * canvasCase.width;
+  canvasCase.style.top = y * canvasCase.height;
+  canvasCase.style.border = "1px solid grey";
+  // overwrite canvas on click method
+  canvasCase.onclick = function() {
+    if (this.carte.visible) {
+      carteToPush = this.carte.clone();
+      mouvementCarte.push(carteToPush);
+      this.carte.remove();
+      this.draw();
+      console.log("Let's move ! " + "\n" + "Array length : " + mouvementCarte.length);
+    }
+    else if (mouvementCarte.length != 0) {
+      this.carte = mouvementCarte.pop();
+      this.carte.visible = true;
+      this.draw();
+      console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length);
     }
     else {
-      this.isSelect = false;
-      console.log(this.id + " unselected!");
+      console.log("Impossible to move ! " + "\n" + "Array length : " + mouvementCarte.length);
     }
   };
-  return canvas;
-}
-function Case2(x, y) {
-  this.x = x;
-  this.y = y;
-  this.carte = new Carte(x + y);
-  this.isCarte = false;
-  this.canvas = new CanvasCarte(x, y);
-  this.ctx = this.canvas.getContext("2d");
-  this.clear = function() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  canvasCase.clear = function() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
   };
-  this.draw = function() {
+  canvasCase.draw = function() {
     carreCote = 12;
     // don't draw if no carte
-    if (this.carteInside()) {
+    if (this.carte.visible) {
       this.ctx.beginPath();
-      this.ctx.rect(0, 0, carreCote, carreCote);//haut gauche
       this.ctx.fillText(this.carte.cout, 0, carreCote-2);
       this.ctx.fillText(this.carte.titre, carreCote+2, carreCote-2);
-      this.ctx.rect(this.canvas.width-carreCote, this.canvas.height-carreCote, carreCote, carreCote);//bas droite
-      this.ctx.fillText(this.carte.defense, this.canvas.width-carreCote, this.canvas.height-2);
-      this.ctx.rect(0, this.canvas.height-carreCote, carreCote, carreCote);// bas gauche
-      this.ctx.fillText(this.carte.attaque, 0, this.canvas.height-2);
-      this.ctx.fillText(this.carte.description, carreCote/2, this.canvas.height-(carreCote+2));
-      this.ctx.drawImage(this.carte.imagej, carreCote+2, carreCote+2, this.canvas.width-2*(carreCote+2), this.canvas.height-3*(carreCote+2));
+      this.ctx.fillText(this.carte.defense, this.width-carreCote, this.height-2);
+      this.ctx.fillText(this.carte.attaque, 0, this.height-2);
+      this.ctx.fillText(this.carte.description, carreCote/2, this.height-(carreCote+2));
+      if (this.carte.imagej.src != "") {
+        this.ctx.drawImage(this.carte.imagej, carreCote+2, carreCote+2, this.width-2*(carreCote+2), this.height-3*(carreCote+2));
+        this.ctx.rect(0, 0, carreCote, carreCote);//haut gauche
+        this.ctx.rect(this.width-carreCote, this.height-carreCote, carreCote, carreCote);//bas droite
+        this.ctx.rect(0, this.height-carreCote, carreCote, carreCote);// bas gauche
+      }
       this.ctx.stroke();
     }
-  };
-  this.carteInside = function() {
-    if (this.carte.initialize) {
-      this.isCarte = true;
-      return true;
-    }
     else {
-      this.isCarte = false;
-      return false;
+      this.clear();
     }
   };
-  this.toString = function() {
-    caseString = "Case :" + "id : " + this.canvas.id + " - " + "x : " + this.x + " - " + "y : " + this.y + " - " + "canvas : " + this.canvas + " - " + "ctx : " + this.ctx + " - " + "isCarte : " + this.isCarte + " - " + "isSelect : " + this.canvas.isSelect;
+  canvasCase.toString = function() {
+    caseString = "Case :" + "id : " + this.id + " - " + "x : " + this.x + " - " + "y : " + this.y + " - " + "ctx : " + this.ctx;
     return caseString + "\n" + this.carte.toString();
   };
+  return canvasCase;
 }
-
 /* Constructor for Emplacement.
  * Emplacement inherit from Canvas class.
  * See createAllEmplacements() function.
@@ -136,9 +136,9 @@ function newEmplacement(x, y) {
   return Emplacement;
 }
 /* Same object as Emplacement but can be instantiate using the new operator.
- * See createAllCases() function.
+ * See createAllCasesTst() function.
 */
-function Case(x, y) {
+function CaseTst(x, y) {
   this.x = x;
   this.y = y;
   this.carte = new Carte(x + y);
@@ -205,10 +205,10 @@ function Case(x, y) {
 */
 function Carte(id) {
   this.id = id;
-  this.initialize = false;
+  this.visible = false;
   this.imagej = new Image();
-  this.init = function(img, cout, att, def, titre, desc) {
-    this.initialize = true;
+  this.add = function(img, cout, att, def, titre, desc) {
+    this.visible = true;
     this.imagej.src = img;
     this.cout = cout;
     this.attaque = att;
@@ -216,15 +216,32 @@ function Carte(id) {
     this.titre = titre;
     this.description = desc;
   };
+  this.remove = function() {
+    this.visible = false;
+    this.imagej = new Image();
+    this.cout = "";
+    this.attaque = "";
+    this.defense = "";
+    this.titre = "";
+    this.description = "";
+  };
+  this.clone = function() {
+    var copy = this.constructor();
+    for (var attr in this) {
+        if (this.hasOwnProperty(attr)) copy[attr] = this[attr];
+    }
+    return copy;
+  }
   this.toString = function() {
     return "Carte : " + "id : " + this.id + " - " + "cout : " + this.cout + " - " + "attaque: " + this.attaque
-            + " - " + "defense: " + this.defense + " - " + "titre: " + this.titre + " - " + "description: " + this.description + " - " + "image: " + this.imagej.src;
+            + " - " + "defense: " + this.defense + " - " + "titre: " + this.titre + " - " + "description: " + this.description + " - " + "image: " + this.imagej.src  + " - " + "visible: " + this.visible;
   };
 }
 Carte.prototype = {
-  cout : "N",
-  attaque : "N",
-  defense : "N",
-  titre : "N",
-  description : "N",
+  visible : false,
+  cout : "",
+  attaque : "",
+  defense : "",
+  titre : "",
+  description : "",
 };

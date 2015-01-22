@@ -14,9 +14,9 @@ var canvas_source = "";
 var canvas_destination = "";
 var allCases = new Array();
 //-----------------------------------------------------------
-//createAllCases();
+//createAllCasesTst();
 //createAllEmplacements();
-createAllCases2();
+createAllCases();
 displayAllCartes();
 //-----------------------------------------------------------
 function displayAllCartes() {
@@ -28,10 +28,10 @@ function displayAllCartes() {
   }
 }
 //-----------------------------------------------------------
-function createAllCases() {
+function createAllCasesTst() {
   for (x = 0; x < grillex; x++) {
     for (y = 0; y < grilley; y++) {
-      var caseInstance = new Case(x, y);
+      var caseInstance = new CaseTst(x, y);
       console.log(caseInstance.toString());
       // only first and last line have carte
       if (y == 0 || y == 3) {
@@ -56,17 +56,17 @@ function createAllEmplacements() {
     }
   }
 }
-function createAllCases2() {
+function createAllCases() {
   for (x = 0; x < grillex; x++) {
     for (y = 0; y < grilley; y++) {
-      var case2Instance = new Case2(x, y);
-      console.log(case2Instance.toString());
+      var caseInstance = new Case(x, y);
+      //console.log(caseInstance.toString());
       // only first and last line have carte
       if (y == 0 || y == 3) {
-        case2Instance.carte.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+        caseInstance.carte.add("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
       }
-      allCases.push(case2Instance);
-      document.body.appendChild(case2Instance.canvas);
+      allCases.push(caseInstance);
+      document.body.appendChild(caseInstance);
     }
   }
 }
