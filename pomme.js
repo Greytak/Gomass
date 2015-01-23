@@ -1,16 +1,62 @@
+/* Plateau object
+*/
+function Plateau(largeur, hauteur) {
+  this.largeur = largeur;
+  this.hauteur = hauteur;
+  this.cases = new Array();
+  this.create = function() {
+    id = 0;
+    for (x = 0; x < this.largeur; x++) {
+      for (y = 0; y < this.hauteur; y++) {
+        var caseInstance = new Case(x, y, id);
+        this.cases.push(caseInstance);
+        document.body.appendChild(caseInstance);
+        id++;
+      }
+    }
+  };
+  this.display = function() {
+    for (i = 0; i < (this.largeur*this.hauteur); i++) {
+      this.cases[i].draw();
+    }
+  };
+  this.add = function(caseid, img, cout, att, def, titre, desc) {
+    this.cases[caseid].carte.add(img, cout, att, def, titre, desc);
+    this.cases[caseid].draw();
+  };
+  this.remove = function(caseid) {
+    this.cases[caseid].carte.remove();
+    this.cases[caseid].draw();
+  };
+  this.clear = function() {
+    for (i = 0; i < (this.largeur*this.hauteur); i++) {
+      this.cases[i].carte.remove();
+      this.cases[i].draw();
+    }
+  };
+  this.toString = function() {
+    plateauString = "Plateau : " + "largeur : " + this.largeur + " - " + "hauteur : " + this.hauteur + "\n";
+    for (i = 0; i < (this.largeur*this.hauteur); i++) {
+      plateauString = plateauString + this.cases[i].toString() + "\n";
+    }
+    return plateauString;
+  };
+}
+
 /* Same as CaseTst but with a new canvas.
  * See createAllCases() function.
 */
 var mouvementCarte = new Array();
-function Case(x, y) {
+function Case(x, y, id) {
   canvasCase = document.createElement('canvas');
   // new properties
   canvasCase.x = x;
   canvasCase.y = y;
-  canvasCase.carte = new Carte(x + y);
+  canvasCase.name = "case" + x + "-" + y;
+  canvasCase.carte = new Carte(id);
   // overwrite canvas properties
   canvasCase.ctx = canvasCase.getContext("2d");
-  canvasCase.id = "case" + x + "-" + y;
+  canvasCase.id = id;
   canvasCase.width = 100;
   canvasCase.height = 150;
   canvasCase.style.zIndex = 8;
@@ -25,16 +71,16 @@ function Case(x, y) {
       mouvementCarte.push(carteToPush);
       this.carte.remove();
       this.draw();
-      console.log("Let's move ! " + "\n" + "Array length : " + mouvementCarte.length);
+      console.log("Let's move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
     }
     else if (mouvementCarte.length != 0) {
       this.carte = mouvementCarte.pop();
       this.carte.visible = true;
       this.draw();
-      console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length);
+      console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
     }
     else {
-      console.log("Impossible to move ! " + "\n" + "Array length : " + mouvementCarte.length);
+      console.log("Impossible to move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
     }
   };
   canvasCase.clear = function() {
@@ -63,7 +109,7 @@ function Case(x, y) {
     }
   };
   canvasCase.toString = function() {
-    caseString = "Case :" + "id : " + this.id + " - " + "x : " + this.x + " - " + "y : " + this.y + " - " + "ctx : " + this.ctx;
+    caseString = "Case :" + "id : " + this.id + " - " + "name : " + this.name + " - " + "x : " + this.x + " - " + "y : " + this.y + " - " + "ctx : " + this.ctx;
     return caseString + "\n" + this.carte.toString();
   };
   return canvasCase;
@@ -205,7 +251,6 @@ function CaseTst(x, y) {
 */
 function Carte(id) {
   this.id = id;
-  this.visible = false;
   this.imagej = new Image();
   this.add = function(img, cout, att, def, titre, desc) {
     this.visible = true;
@@ -217,6 +262,7 @@ function Carte(id) {
     this.description = desc;
   };
   this.remove = function() {
+    this.id = -1;
     this.visible = false;
     this.imagej = new Image();
     this.cout = "";
