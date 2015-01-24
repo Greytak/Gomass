@@ -1,4 +1,5 @@
-/* Plateau object
+/* 
+ *Plateau object
 */
 function Plateau(largeur, hauteur) {
   this.largeur = largeur;
@@ -36,17 +37,23 @@ function Plateau(largeur, hauteur) {
   };
   this.toString = function() {
     plateauString = "Plateau : " + "largeur : " + this.largeur + " - " + "hauteur : " + this.hauteur + "\n";
-    for (i = 0; i < (this.largeur*this.hauteur); i++) {
-      plateauString = plateauString + this.cases[i].toString() + "\n";
+    if (this.cases.length > 0) {
+      for (i = 0; i < (this.largeur*this.hauteur); i++) {
+        plateauString = plateauString + this.cases[i].toString() + "\n";
+      }
     }
     return plateauString;
   };
 }
 
-/* Same as CaseTst but with a new canvas.
- * See createAllCases() function.
+/* 
+ * Global used to store carte begin movement
 */
 var mouvementCarte = new Array();
+/* 
+ * Case inherit from Canvas
+ * See createAllCases() function.
+*/
 function Case(x, y, id) {
   canvasCase = document.createElement('canvas');
   // new properties
@@ -110,10 +117,12 @@ function Case(x, y, id) {
   };
   canvasCase.toString = function() {
     caseString = "Case :" + "id : " + this.id + " - " + "name : " + this.name + " - " + "x : " + this.x + " - " + "y : " + this.y + " - " + "ctx : " + this.ctx;
+    caseString = caseString + " - " + "width : " + this.width + " - " + "height : " + this.height + " - " + "zIndex : " + this.style.zIndex;
     return caseString + "\n" + this.carte.toString();
   };
   return canvasCase;
 }
+
 /* Constructor for Emplacement.
  * Emplacement inherit from Canvas class.
  * See createAllEmplacements() function.
