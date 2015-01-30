@@ -8,92 +8,84 @@
 </body>
 <script>
 //-----------------------------------------------------------
-var grillex = 8;
-var grilley = 4;
-var canvas_source = "";
-var canvas_destination = "";
-var allCases = new Array();
+////////////////////////////////MAIN/////////////////////////
+// main board
+var mainBoard = new Plateau(8, 4, 0, 0); // init the gomas Plateau
+mainBoard.create(); // create all cases
+mainBoard.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(4, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(16, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+console.log(mainBoard.toString()); // to display log
+// secondary board
+var pile = new Plateau(1, 2, 900, 150);
+pile.create();
+pile.add(0, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+console.log(pile.toString()); // to display log
+// buttons
+var sendB = new gomassButton(900, 450, "next", "command=endturn");
+var rezB = new gomassButton(950, 450, "reset");
+// infos zone
+var infoD = new gomassInfo(900, 500, "info");
 //-----------------------------------------------------------
-// init the gomas Plateau
-var gomass = new Plateau(grillex, grilley);
-// create all cases
-gomass.create();
-// display every things are visible
-//gomass.display();
-// add a carte number 3 to plateau and display it
-gomass.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-// want to display all?
-//for (i = 0; i < gomass.cases.length; i++) {
-//  gomass.add(i, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-//}
-// remove carte 5
-//gomass.remove(5);
-// remove all
-//gomass.clear();
-// to display log
-console.log(gomass.toString());
-//-----------------------------------------------------------
-// uncomment one by one to test
-/*
-//createAllCasesTst();
-//createAllEmplacements();
-//createAllCases();
-*/
-//displayAllCartes();
-//-----------------------------------------------------------
-function displayAllCartes() {
-  for (i = 0; i < (grillex*grilley); i++) {
-    allCases[i].clear();
-    allCases[i].draw();
-    // log all
-    console.log(allCases[i].toString());
+////////////////////////////////USEFULL//////////////////////
+function gomassButton(x, y, val, req) {
+  element = document.createElement("input");
+  element.type = "button";
+  element.value = val;
+  element.id = val;
+  element.style.position = "absolute";
+  element.style.left = x;
+  element.style.top = y;
+  element.disabled = false;
+  element.onclick = function() {
+    goajaxrequete(req);
   }
+  document.body.appendChild(element);
+  return element;
 }
-//-----------------------------------------------------------
-function createAllCasesTst() {
-  for (x = 0; x < grillex; x++) {
-    for (y = 0; y < grilley; y++) {
-      var caseInstance = new CaseTst(x, y);
-      console.log(caseInstance.toString());
-      // only first and last line have carte
-      if (y == 0 || y == 3) {
-        caseInstance.carte.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-      }
-      allCases.push(caseInstance);
-      document.body.appendChild(caseInstance.canvas);
+function gomassInfo(x, y, val) {
+  element = document.createElement("div");
+  element.id = val;
+  element.value = val;
+  element.innerHTML = "<h3>"+val+"</h3></br>";
+  element.style.position = "absolute";
+  element.style.left = x;
+  element.style.top = y;
+  document.body.appendChild(element);
+  return element;
+}
+function goajaxrequete(req) {
+  var xmlhttp;
+  if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp = new XMLHttpRequest();
+  }
+  else { // code for IE6, IE5
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xmlhttp.onreadystatechange = function() {
+  if (xmlhttp.readyState==4 && xmlhttp.status == 200 || xmlhttp.status == 304) {
+      //response=xmlhttp.responseText;
+      processajaxresponse(xmlhttp.responseText);
     }
   }
+  // requete treatment
+  xmlhttp.open("POST", "http://localhost:8080/?"+req, true);
+  //xmlhttp.setRequestHeader("Content-type", "application/html");//not to localhost
+  xmlhttp.send();
 }
-function createAllEmplacements() {
-  for (x = 0; x < grillex; x++) {
-    for (y = 0; y < grilley; y++) {
-      var emplacementInstance = newEmplacement(x, y);
-      console.log(emplacementInstance.toString());
-      // only first and last line have carte
-      if (y == 0 || y == 3) {
-        emplacementInstance.carte.init("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-      }
-      allCases.push(emplacementInstance);
-      document.body.appendChild(emplacementInstance);
-    }
+function processajaxresponse(response) {
+  if (response == "finish") {
+    sendB.disabled = true;
+  }
+  if (response == "moveOk") {
+    infoD.innerHTML = "Movement valid!";
+  }
+  if (response == "moveKo") {
+    infoD.innerHTML = "Movement invalid!";
   }
 }
-function createAllCases() {
-id = 0;
-  for (x = 0; x < grillex; x++) {
-    for (y = 0; y < grilley; y++) {
-      var caseInstance = new Case(x, y, id);
-      //console.log(caseInstance.toString());
-      // only first and last line have carte
-      if (y == 0 || y == 3) {
-        caseInstance.carte.add("darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-      }
-      allCases.push(caseInstance);
-      document.body.appendChild(caseInstance);
-      id++;
-    }
-  id++;
-  }
-}
+//-----------------------------------------------------------
+
+//-----------------------------------------------------------
 </script>
 </html>
