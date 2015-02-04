@@ -1,0 +1,122 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="gomassBoard.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+  <title>Gomass</title>
+</head>
+<body>
+</body>
+<script>
+//-----------------------------------------------------------
+////////////////////////////////MAIN/////////////////////////
+
+//BEGIN CHAT
+var gomassUserName = new gomassButton(900, 50, "text", "name");
+var userNameB = new gomassButton(1100, 50, "button", "connect");
+userNameB.onclick = function() {
+  if (gomassUserName.value != '') {
+    socket.emit('add user', gomassUserName.value);
+  }
+}
+var finishB = new gomassButton(900, 450, "button", "finish");
+finishB.onclick = function() {
+}
+
+var gomassChat = new gomassBox(900, 500, "gomass");
+var talkT = new gomassButton(900, 580, "text", "talk");
+talkT.size = 20;talkT.value = '';
+var talkB = new gomassButton(1100, 580, "button", "send");
+talkB.onclick = function() {
+  socket.emit('new message', talkT.value);
+}
+var socket = io.connect('http://localhost:3000');
+// reponse du serveur a la connection quand c'est toi
+socket.on('login', function(message) {
+  //gomassChat.value += 'Le nombre de joueur est de : ' + message.numUsers + '\n';
+  console.log('Le nombre de joueur est de : ' + message.numUsers);
+})
+// quand c'est pas toi
+socket.on('user joined', function(message) {
+  //gomassChat.value += 'Le joueur : ' + message.username + ' vient de rejoindre la partie.\n';
+  console.log('Le joueur : ' + message.username + ' vient de rejoindre la partie.');
+})
+// quand t'envoie un message
+socket.on('new message', function(message) {
+  gomassChat.value += message.username + ' : ' + message.message + '\n';
+  //console.log(message.username + ' : ' + message.message);
+})
+//END CHAT
+//BEGIN MOVE
+socket.on('myMove', function(message) {
+  console.log(message.validated);
+})
+socket.on('hisMove', function(message) {
+  tempMove = message.validated.split(",");
+  mainBoard.move(tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
+  console.log(message.validated);
+  //console.log(tempMove[0] + ':' + tempMove[1]+ ':' + tempMove[2]+ ':' + tempMove[3]);
+})
+//
+//END MOVE
+
+// BEGIN UI
+// main board
+var mainBoard = new Plateau(0, 0); // init the gomas Plateau
+mainBoard.create(8, 4); // create all cases
+mainBoard.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(4, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(16, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+console.log(mainBoard.toString()); // to display log
+// secondary board
+var pile = new Plateau(900, 150);
+pile.create(1, 2);
+pile.add(0, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+console.log(pile.toString()); // to display log
+//END UI
+
+//-----------------------------------------------------------
+////////////////////////////////USEFULL//////////////////////
+function gomassButton(x, y, type, val) {
+  element = document.createElement("input");
+  element.type = type;
+  element.value = val;
+  element.id = val;
+  element.style.position = "absolute";
+  element.style.left = x;
+  element.style.top = y;
+  element.disabled = false;
+  document.body.appendChild(element);
+  return element;
+}
+function gomassInfo(x, y, val) {
+  element = document.createElement("div");
+  element.id = val;
+  element.value = val;
+  element.innerHTML = "<h3>"+val+"</h3></br>";
+  element.style.position = "absolute";
+  element.style.left = x;
+  element.style.top = y;
+  document.body.appendChild(element);
+  return element;
+}
+function gomassBox(x, y, val) {
+  element = document.createElement("textarea");
+  element.cols = 30;
+  element.rows = 3;
+  element.id = val;
+  element.name = val;
+  element.readonly = true;
+  element.style.position = "absolute";
+  element.style.left = x;
+  element.style.top = y;
+  element.disabled = false;
+  document.body.appendChild(element);
+  return element;
+}
+//-----------------------------------------------------------
+
+//-----------------------------------------------------------
+</script>
+</html>
