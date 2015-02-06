@@ -1,4 +1,6 @@
 Gomass :
+
+test
 --------------------------------------------
 setTimeout ("goajaxrequete()", 750);
 click destination => command move
