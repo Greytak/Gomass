@@ -10,10 +10,11 @@ function Plateau(name, posx, posy) {
   this.create = function(largeur, hauteur) {
     this.largeur = largeur;
     this.hauteur = hauteur;
+    gameName = name;
     id = 0;
     for (x = 0; x < largeur; x++) {
       for (y = 0; y < hauteur; y++) {
-        var caseInstance = new Case(name, x, y, posx, posy, id);
+        var caseInstance = new Case(x, y, posx, posy, id);
         this.cases.push(caseInstance);
         document.body.appendChild(caseInstance);
         id++;
@@ -37,14 +38,13 @@ function Plateau(name, posx, posy) {
     this.cases[caseid].draw();
   };
   // move a carte on the plateau
-  this.move = function(srcx, srcy, dstx, dsty) {
-    srcId = this.getId(srcx, srcy);
-    dstId = this.getId(dstx, dsty);
-    tempCarte = this.cases[srcId].carte.clone();
-    this.cases[srcId].clear();
-    this.cases[srcId].draw();
-    this.cases[dstId].carte = tempCarte;
-    this.cases[dstId].draw();
+  this.move = function(srcid, dstid) {
+    console.log('start move : ' + srcid + ' : ' + dstid);
+    this.cases[dstid].carte = this.cases[srcid].carte;
+    this.cases[dstid].draw();
+    this.cases[srcid].clear();
+    this.cases[srcid].draw();
+    this.display();
   };
   // clear all cartes
   this.clear = function() {
@@ -73,17 +73,16 @@ function Plateau(name, posx, posy) {
  * Global used to store carte begin movement
 */
 var mouvementCarte = new Array();
-
+var gameName = '';
 /*
  * Case inherit from Canvas
  * See createAllCases() function.
 */
-function Case(gamename, casex, casey, posx, posy, id) {
+function Case(casex, casey, posx, posy, id) {
   canvasCase = document.createElement('canvas');
   // new properties
   canvasCase.x = casex;
   canvasCase.y = casey;
-  canvasCase.gameName = gamename;
   canvasCase.name = "case" + casex + "-" + casey;
   canvasCase.carte = new Carte(id, casex, casey);
   // overwrite canvas properties
@@ -106,31 +105,18 @@ function Case(gamename, casex, casey, posx, posy, id) {
       console.log("Let's move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
     }
     else if (!this.carte.visible && mouvementCarte.length > 0) {
+      dstid = this.carte.id;
       this.carte = mouvementCarte.pop();
-      srcx = this.carte.x;
-      srcy = this.carte.y;
       this.carte.visible = true;
       this.carte.move(this.x, this.y);
       this.draw();
-      if (mouvementCarte.length == 0 && this.gameName != '') {
-        movement = srcx + ',' + srcy + ',' + this.carte.x + ',' + this.carte.y;
+      if (mouvementCarte.length == 0 && gameName != '') {
+        movement = this.carte.id + ',' + dstid;
         // emit to everyone
         socket.emit('move', {
-          room: this.gameName,
+          room: gameName,
           message: movement
         });
-        // emit to the game
-        /*
-        socket.to(this.gameName).emit('move', {
-          room: this.gameName,
-          message: movement
-        });
-        */
-        /*io.to(this.gameName).emit('move', {
-          move: movement,
-          game: this.gameName
-        });*/
-
         console.log(movement);
         //console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
         //console.log(this.toString());console.log(this.carte.toString());

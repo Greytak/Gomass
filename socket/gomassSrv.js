@@ -70,9 +70,9 @@ io.on('connection', function (socket) {
   // when the client emits 'move', we broadcast it to others
   socket.on('move', function (data) {
     console.log('received a new move from : ' + data.room);
-    tempMove = data.message; //srcx, srcy, dstx, dsty
+    tempMove = data.message; //srcid, dstid
     tempMove.split(",");
-    storeMovement(socket.username, tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
+    storeMovement(socket.username, tempMove[0], tempMove[1]);
     console.log('emit to room : ' + socket.game);
     //socket.broadcast.to(data.room).emit('myMove', {
     //io.sockets.in(data.room).emit('myMove', {

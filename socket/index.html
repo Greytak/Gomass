@@ -137,7 +137,8 @@ socket.on('myMove', function(message) {
 socket.on('hisMove', function(message) {
   console.log('Received hisMove : ' + message.validated);
   tempMove = message.move.split(",");
-  mainBoard.move(tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
+  console.log('move : '+ tempMove[0] +' : '+ tempMove[1]);
+  mainBoard.move(tempMove[0], tempMove[1]);
 })
 //END MOVE
 
