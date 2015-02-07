@@ -35,7 +35,7 @@ function storeMovement(user, srcx, srcy, dstx, dsty) {
 io.on('connection', function (socket) {
   console.log('connection to namespace : ' + io.name);
   console.log('connection to the soket : ' + socket.id);
-  
+
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username) {
     console.log('add user : ' + username);
@@ -68,16 +68,24 @@ io.on('connection', function (socket) {
   });
 
   // when the client emits 'move', we broadcast it to others
-  socket.on('move', function (movement) {
-    tempMove = movement; //srcx, srcy, dstx, dsty
+  socket.on('move', function (data) {
+    console.log('received a new move from : ' + data.room);
+    tempMove = data.message; //srcx, srcy, dstx, dsty
     tempMove.split(",");
     storeMovement(socket.username, tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
     console.log('emit to room : ' + socket.game);
-    io.to(socket.game).emit('myMove', {
+    //socket.broadcast.to(data.room).emit('myMove', {
+    //io.sockets.in(data.room).emit('myMove', {
+    socket.emit('myMove', {
       validated: "Move Ok.",
+      move: data.message,
+      player: socket.username
     });
-    io.to(socket.game).emit('hisMove', {
-      validated: movement
+    //socket.broadcast.to(data.room).emit('hisMove', {
+    socket.broadcast.to(data.room).emit('hisMove', {
+        validated: "New move.",
+      move: data.message,
+      player: socket.username
     });
   });
 
@@ -95,12 +103,13 @@ io.on('connection', function (socket) {
       });
     }
   });
-  
+
   socket.on('newGame', function (gameName) {
     console.log('create a new game : ' + gameName);
     socket.game = gameName;
     socket.join(gameName);
     io.to(gameName).emit('newGameOk', {
+    //socket.to(gameName).emit('newGameOk', {
       validated: "The game is created : " + gameName,
       game: gameName
     });
@@ -108,13 +117,15 @@ io.on('connection', function (socket) {
       validated: "A new game is created : " + gameName,
       game: gameName
     });
+    //socket.leave(gameName);
   });
-  
+
   socket.on('joinGame', function (gameName) {
     console.log('join a game : ' + gameName);
     socket.game = gameName;
     socket.join(gameName);
     io.to(gameName).emit('joinGameOk', {
+    //socket.to(gameName).emit('joinGameOk', {
       validated: "You join the game : " + gameName,
       game: gameName
     });
@@ -122,9 +133,17 @@ io.on('connection', function (socket) {
       validated: "The game is closed : " + gameName,
       game: gameName
     });
+    //socket.leave(gameName);
   });
 });
 
+//socket.broadcast.to(data.room).emit('moveOk', {
+//io.sockets.in(data.room).emit('moveOk', {
+
+//socket.join(data.room);
+//io.to(gameName)
+
+//io.to(socket.game)
     /*
     socket.emit('myMove', {
       validated: "Move Ok."

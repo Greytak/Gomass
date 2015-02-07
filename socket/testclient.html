@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="gomassBoard.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+<title>Gomass</title>
+</head>
+<body>
+</body>
+<script>
+
+var socket = io.connect();
+ socket.on('message', function (data) {
+  console.log(data);
+ });
+
+ socket.emit('subscribe', 'roomOne');
+ socket.emit('subscribe', 'roomTwo');
+
+ socket.emit('send', { room: 'roomOne', message: 'meessaaggee' });
+
+ socket.on('message', function(message) {
+   console.log('Received message : ' + message);
+ })
+
+/* $('#send').click(function() {
+  var room = $('#room').val(),
+   message = $('#message').val();
+
+  socket.emit('send', { room: room, message: message });
+});*/
+ //-----------------------------------------------------------
+
+ //-----------------------------------------------------------
+</script>
+</html>

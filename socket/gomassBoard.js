@@ -1,4 +1,4 @@
-/* 
+/*
  *Plateau object
 */
 function Plateau(name, posx, posy) {
@@ -69,12 +69,12 @@ function Plateau(name, posx, posy) {
   };
 }
 
-/* 
+/*
  * Global used to store carte begin movement
 */
 var mouvementCarte = new Array();
 
-/* 
+/*
  * Case inherit from Canvas
  * See createAllCases() function.
 */
@@ -115,17 +115,25 @@ function Case(gamename, casex, casey, posx, posy, id) {
       if (mouvementCarte.length == 0 && this.gameName != '') {
         movement = srcx + ',' + srcy + ',' + this.carte.x + ',' + this.carte.y;
         // emit to everyone
-        socket.emit('move', movement);
+        socket.emit('move', {
+          room: this.gameName,
+          message: movement
+        });
         // emit to the game
         /*
-        io.to('Room'+this.gameName).emit('move', {
-          move: movement,
-          game: this.gameName
+        socket.to(this.gameName).emit('move', {
+          room: this.gameName,
+          message: movement
         });
         */
+        /*io.to(this.gameName).emit('move', {
+          move: movement,
+          game: this.gameName
+        });*/
+
         console.log(movement);
-        console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
-        console.log(this.toString());console.log(this.carte.toString());
+        //console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
+        //console.log(this.toString());console.log(this.carte.toString());
       }
     }
     else {
@@ -213,7 +221,7 @@ function Carte(id, x, y) {
 }
 Carte.prototype = {
   visible : false,
-  imagej : new Image(),
+  //imagej : new Image(),
   cout : "",
   attaque : "",
   defense : "",

@@ -62,11 +62,11 @@ talkB.onclick = function() {
 }
 function createGame() {
   if (gameName != 'DEFAULT') {
-    pile = new Plateau(socket.id+gameName, 820, 150);
+    pile = new Plateau(gameName, 820, 150);
       pile.create(1, 2);
       pile.add(0, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
       //console.log(pile.toString()); // to display log
-    mainBoard = new Plateau(socket.id+gameName, 0, 0); // init the gomas Plateau
+    mainBoard = new Plateau(gameName, 0, 0); // init the gomas Plateau
       mainBoard.create(8, 4); // create all cases
       mainBoard.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
       mainBoard.add(4, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
@@ -135,10 +135,9 @@ socket.on('myMove', function(message) {
   console.log('Received myMove : ' + message.validated);
 })
 socket.on('hisMove', function(message) {
-  tempMove = message.validated.split(",");
-  mainBoard.move(tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
   console.log('Received hisMove : ' + message.validated);
-  //console.log(tempMove[0] + ':' + tempMove[1]+ ':' + tempMove[2]+ ':' + tempMove[3]);
+  tempMove = message.move.split(",");
+  mainBoard.move(tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
 })
 //END MOVE
 
