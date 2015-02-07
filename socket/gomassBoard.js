@@ -1,9 +1,10 @@
 /* 
  *Plateau object
 */
-function Plateau(posx, posy) {
+function Plateau(name, posx, posy) {
   this.largeur = 0;
   this.hauteur = 0;
+  this.name = name;
   this.cases = new Array();
   // create all cases and cartes
   this.create = function(largeur, hauteur) {
@@ -12,7 +13,7 @@ function Plateau(posx, posy) {
     id = 0;
     for (x = 0; x < largeur; x++) {
       for (y = 0; y < hauteur; y++) {
-        var caseInstance = new Case(x, y, posx, posy, id);
+        var caseInstance = new Case(name, x, y, posx, posy, id);
         this.cases.push(caseInstance);
         document.body.appendChild(caseInstance);
         id++;
@@ -77,11 +78,12 @@ var mouvementCarte = new Array();
  * Case inherit from Canvas
  * See createAllCases() function.
 */
-function Case(casex, casey, posx, posy, id) {
+function Case(gamename, casex, casey, posx, posy, id) {
   canvasCase = document.createElement('canvas');
   // new properties
   canvasCase.x = casex;
   canvasCase.y = casey;
+  canvasCase.gameName = gamename;
   canvasCase.name = "case" + casex + "-" + casey;
   canvasCase.carte = new Carte(id, casex, casey);
   // overwrite canvas properties
@@ -110,9 +112,17 @@ function Case(casex, casey, posx, posy, id) {
       this.carte.visible = true;
       this.carte.move(this.x, this.y);
       this.draw();
-      if (mouvementCarte.length == 0) {
+      if (mouvementCarte.length == 0 && this.gameName != '') {
         movement = srcx + ',' + srcy + ',' + this.carte.x + ',' + this.carte.y;
+        // emit to everyone
         socket.emit('move', movement);
+        // emit to the game
+        /*
+        io.to('Room'+this.gameName).emit('move', {
+          move: movement,
+          game: this.gameName
+        });
+        */
         console.log(movement);
         console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
         console.log(this.toString());console.log(this.carte.toString());
@@ -203,6 +213,7 @@ function Carte(id, x, y) {
 }
 Carte.prototype = {
   visible : false,
+  imagej : new Image(),
   cout : "",
   attaque : "",
   defense : "",

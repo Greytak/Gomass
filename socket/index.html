@@ -11,70 +11,136 @@
 <script>
 //-----------------------------------------------------------
 ////////////////////////////////MAIN/////////////////////////
-
-//BEGIN CHAT
-var gomassUserName = new gomassButton(900, 50, "text", "name");
-var userNameB = new gomassButton(1100, 50, "button", "connect");
+//-----------------------------------------------------------
+var rootUrl = 'http://localhost:3000';
+var gameName = 'DEFAULT';
+var pile;var mainBoard;
+//-----------------------------------------------------------
+// BEGIN UI
+// Up area
+var userNameT = new gomassButton(820, 10, "text", "pseudo");
+var userNameB = new gomassButton(980, 10, "button", "connect");
 userNameB.onclick = function() {
-  if (gomassUserName.value != '') {
-    socket.emit('add user', gomassUserName.value);
+  if (userNameT.value != '') {
+    socket.emit('add user', userNameT.value);
+    userNameB.disabled = true;
+    userNameT.disabled = true;
   }
 }
-var finishB = new gomassButton(900, 450, "button", "finish");
-finishB.onclick = function() {
+var createT = new gomassButton(820, 50, "text", "game");
+var createB = new gomassButton(980, 50, "button", ".create.");
+createB.onclick = function() {
+  socket.emit('newGame', createT.value);
+  console.log('create game : ' + createT.value);
+  createB.disabled = true;
+  createT.disabled = true;
+  joinB.disabled = true;
+  joinT.disabled = true;
+}
+var joinT = new gomassButton(820, 90, "text", "game");
+var joinB = new gomassButton(980, 90, "button", ".join.");
+joinB.onclick = function() {
+  socket.emit('joinGame', joinT.value);
+  console.log('join game : ' + joinT.value);
+  createB.disabled = true;
+  createT.disabled = true;
+  joinB.disabled = true;
+  joinT.disabled = true;
 }
 
-var gomassChat = new gomassBox(900, 500, "gomass");
-var talkT = new gomassButton(900, 580, "text", "talk");
+// Middle area
+// secondary board
+var gomassListGame = new gomassBox(940, 150, "gameList");
+gomassListGame.cols = 15;gomassListGame.rows = 19;
+// Down area
+var gomassChat = new gomassBox(820, 500, "chatArea");
+var talkT = new gomassButton(820, 580, "text", "talk");
 talkT.size = 20;talkT.value = '';
-var talkB = new gomassButton(1100, 580, "button", "send");
+var talkB = new gomassButton(980, 580, "button", "send");
 talkB.onclick = function() {
   socket.emit('new message', talkT.value);
 }
-var socket = io.connect('http://localhost:3000');
+function createGame() {
+  if (gameName != 'DEFAULT') {
+    pile = new Plateau(socket.id+gameName, 820, 150);
+      pile.create(1, 2);
+      pile.add(0, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+      //console.log(pile.toString()); // to display log
+    mainBoard = new Plateau(socket.id+gameName, 0, 0); // init the gomas Plateau
+      mainBoard.create(8, 4); // create all cases
+      mainBoard.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+      mainBoard.add(4, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+      mainBoard.add(16, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+      //console.log(mainBoard.toString()); // to display log
+  }
+}
+//END UI
+//-----------------------------------------------------------
+
+//BEGIN CHAT
+var socket = io.connect(rootUrl);
+
 // reponse du serveur a la connection quand c'est toi
 socket.on('login', function(message) {
   //gomassChat.value += 'Le nombre de joueur est de : ' + message.numUsers + '\n';
-  console.log('Le nombre de joueur est de : ' + message.numUsers);
+  console.log('Received user joined : ' + message.numUsers);
 })
 // quand c'est pas toi
 socket.on('user joined', function(message) {
   //gomassChat.value += 'Le joueur : ' + message.username + ' vient de rejoindre la partie.\n';
-  console.log('Le joueur : ' + message.username + ' vient de rejoindre la partie.');
+  console.log('Received user joined : ' + message.username);
 })
 // quand t'envoie un message
 socket.on('new message', function(message) {
   gomassChat.value += message.username + ' : ' + message.message + '\n';
   //console.log(message.username + ' : ' + message.message);
 })
+// quand un user se déco
+socket.on('user left', function(message) {
+  gomassChat.value += message.username + ' : leave the game!' + '\n';
+  console.log('Received user left : ' + message.username + ' : ' + message.message);
+})
+
 //END CHAT
+//-----------------------------------------------------------
+
+//BEGIN CREATE GAME
+//var socketReg = io(rootUrl+'/register');
+socket.on('newGameOk', function(message) {
+  gomassListGame.value += message.game;
+  gameName = createT.value;
+  createGame();
+  console.log('Received newGameOk : ' + message.validated);
+})
+socket.on('joinGameOk', function(message) {
+  gomassListGame.value -= message.game;
+  gameName = createT.value;
+  createGame();
+  console.log('Received joinGameOk : ' + message.validated);
+})
+socket.on('openGame', function(message) {
+  gomassListGame.value += message.game;
+  console.log('Received openGame : ' + message.validated);
+})
+socket.on('closeGame', function(message) {
+  gomassListGame.value -= message.game;
+  console.log('Received closeGame : ' + message.validated);
+})
+
+//END CREATE GAME
+//-----------------------------------------------------------
+
 //BEGIN MOVE
 socket.on('myMove', function(message) {
-  console.log(message.validated);
+  console.log('Received myMove : ' + message.validated);
 })
 socket.on('hisMove', function(message) {
   tempMove = message.validated.split(",");
   mainBoard.move(tempMove[0], tempMove[1], tempMove[2], tempMove[3]);
-  console.log(message.validated);
+  console.log('Received hisMove : ' + message.validated);
   //console.log(tempMove[0] + ':' + tempMove[1]+ ':' + tempMove[2]+ ':' + tempMove[3]);
 })
-//
 //END MOVE
-
-// BEGIN UI
-// main board
-var mainBoard = new Plateau(0, 0); // init the gomas Plateau
-mainBoard.create(8, 4); // create all cases
-mainBoard.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
-mainBoard.add(4, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
-mainBoard.add(16, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
-console.log(mainBoard.toString()); // to display log
-// secondary board
-var pile = new Plateau(900, 150);
-pile.create(1, 2);
-pile.add(0, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
-console.log(pile.toString()); // to display log
-//END UI
 
 //-----------------------------------------------------------
 ////////////////////////////////USEFULL//////////////////////
