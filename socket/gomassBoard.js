@@ -1,11 +1,17 @@
 /*
+ * Global used to store carte begin movement
+*/
+var mouvementCarte = new Array();
+var gameName = '';
+
+/*
  *Plateau object
 */
 function Plateau(name, posx, posy) {
   this.largeur = 0;
   this.hauteur = 0;
   this.name = name;
-  this.cases = new Array();
+  this.cases = [];
   // create all cases and cartes
   this.create = function(largeur, hauteur) {
     this.largeur = largeur;
@@ -15,7 +21,7 @@ function Plateau(name, posx, posy) {
     for (x = 0; x < largeur; x++) {
       for (y = 0; y < hauteur; y++) {
         var caseInstance = new Case(x, y, posx, posy, id);
-        this.cases.push(caseInstance);
+        this.cases[id] = caseInstance;
         document.body.appendChild(caseInstance);
         id++;
       }
@@ -39,12 +45,11 @@ function Plateau(name, posx, posy) {
   };
   // move a carte on the plateau
   this.move = function(srcid, dstid) {
-    console.log('start move : ' + srcid + ' : ' + dstid);
-    this.cases[dstid].carte = this.cases[srcid].carte;
+    this.cases[dstid].carte = this.cases[srcid].carte.clone();
+    this.cases[dstid].carte.changeId(dstid);
     this.cases[dstid].draw();
     this.cases[srcid].clear();
     this.cases[srcid].draw();
-    this.display();
   };
   // clear all cartes
   this.clear = function() {
@@ -70,11 +75,6 @@ function Plateau(name, posx, posy) {
 }
 
 /*
- * Global used to store carte begin movement
-*/
-var mouvementCarte = new Array();
-var gameName = '';
-/*
  * Case inherit from Canvas
  * See createAllCases() function.
 */
@@ -84,7 +84,7 @@ function Case(casex, casey, posx, posy, id) {
   canvasCase.x = casex;
   canvasCase.y = casey;
   canvasCase.name = "case" + casex + "-" + casey;
-  canvasCase.carte = new Carte(id, casex, casey);
+  canvasCase.carte = new Carte(id);
   // overwrite canvas properties
   canvasCase.ctx = canvasCase.getContext("2d");
   canvasCase.id = id;
@@ -105,21 +105,19 @@ function Case(casex, casey, posx, posy, id) {
       console.log("Let's move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
     }
     else if (!this.carte.visible && mouvementCarte.length > 0) {
-      dstid = this.carte.id;
-      this.carte = mouvementCarte.pop();
-      this.carte.visible = true;
-      this.carte.move(this.x, this.y);
+      dstid = this.id; // id du canvas sur lequel on depose la carte
+      this.carte = mouvementCarte.pop(); // on recupere la carte src
+      srcid = this.carte.id; // id du canvas source
+      this.carte.changeId(dstid);
       this.draw();
       if (mouvementCarte.length == 0 && gameName != '') {
-        movement = this.carte.id + ',' + dstid;
+        movement = srcid + ',' + dstid;
         // emit to everyone
         socket.emit('move', {
           room: gameName,
           message: movement
         });
-        console.log(movement);
-        //console.log("Finish move ! " + "\n" + "Array length : " + mouvementCarte.length + "\n" + "case.id : " + this.id + "\n" + "carte.id : " + this.carte.id);
-        //console.log(this.toString());console.log(this.carte.toString());
+        console.log('Send move :' + movement);
       }
     }
     else {
@@ -163,10 +161,8 @@ function Case(casex, casey, posx, posy, id) {
 /*
  * Carte prototype.
 */
-function Carte(id, x, y) {
+function Carte(id) {
   this.id = id;
-  this.x = x;
-  this.y = y;
   this.imagej = new Image();
   this.add = function(img, cout, att, def, titre, desc) {
     this.visible = true;
@@ -178,9 +174,6 @@ function Carte(id, x, y) {
     this.description = desc;
   };
   this.remove = function() {
-    this.id = -1;
-    this.x = -1;
-    this.y = -1;
     this.visible = false;
     this.imagej = new Image();
     this.cout = "";
@@ -189,9 +182,8 @@ function Carte(id, x, y) {
     this.titre = "";
     this.description = "";
   };
-  this.move = function(x, y) {
-    this.x = x;
-    this.y = y;
+  this.changeId = function(id) {
+    this.id = id;
   };
   this.clone = function() {
     var copy = this.constructor();
@@ -206,8 +198,9 @@ function Carte(id, x, y) {
   };
 }
 Carte.prototype = {
+  id : -1,
   visible : false,
-  //imagej : new Image(),
+  imagej : new Image(),
   cout : "",
   attaque : "",
   defense : "",

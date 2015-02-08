@@ -74,14 +74,13 @@ io.on('connection', function (socket) {
     tempMove.split(",");
     storeMovement(socket.username, tempMove[0], tempMove[1]);
     console.log('emit to room : ' + socket.game);
-    //socket.broadcast.to(data.room).emit('myMove', {
-    //io.sockets.in(data.room).emit('myMove', {
+    // send only to the requester
     socket.emit('myMove', {
       validated: "Move Ok.",
       move: data.message,
       player: socket.username
     });
-    //socket.broadcast.to(data.room).emit('hisMove', {
+    // send to all in the room except requester
     socket.broadcast.to(data.room).emit('hisMove', {
         validated: "New move.",
       move: data.message,
@@ -108,24 +107,23 @@ io.on('connection', function (socket) {
     console.log('create a new game : ' + gameName);
     socket.game = gameName;
     socket.join(gameName);
-    io.to(gameName).emit('newGameOk', {
-    //socket.to(gameName).emit('newGameOk', {
+    // reply to the requester
+    socket.emit('newGameOk', {
       validated: "The game is created : " + gameName,
       game: gameName
     });
+    // send to all other
     socket.broadcast.emit('openGame', {
       validated: "A new game is created : " + gameName,
       game: gameName
     });
-    //socket.leave(gameName);
   });
 
   socket.on('joinGame', function (gameName) {
     console.log('join a game : ' + gameName);
     socket.game = gameName;
     socket.join(gameName);
-    io.to(gameName).emit('joinGameOk', {
-    //socket.to(gameName).emit('joinGameOk', {
+    socket.emit('joinGameOk', {
       validated: "You join the game : " + gameName,
       game: gameName
     });
@@ -133,37 +131,6 @@ io.on('connection', function (socket) {
       validated: "The game is closed : " + gameName,
       game: gameName
     });
-    //socket.leave(gameName);
   });
+  
 });
-
-//socket.broadcast.to(data.room).emit('moveOk', {
-//io.sockets.in(data.room).emit('moveOk', {
-
-//socket.join(data.room);
-//io.to(gameName)
-
-//io.to(socket.game)
-    /*
-    socket.emit('myMove', {
-      validated: "Move Ok."
-    });
-    socket.broadcast.emit('hisMove', {
-      validated: movement
-    });
-    */
-
-/*
-// namespace Register Games
-var register = io.of('/register');
-register.on('connection', function(socket){
-  console.log('someone connected');
-});
-
-// namespace Game
-var gameOn = io.of('/game');
-gameOn.on('connection', function(socket){
-  console.log('someone connected');
-  gameOn.emit('hi', 'everyone!');
-});
-*/
