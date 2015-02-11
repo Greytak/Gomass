@@ -66,13 +66,17 @@ joinB.onclick = function(game) {
 // Middle area
 var pile = new Plateau(gameName, 820, 150);
 pile.create(1, 2);
-pile.add(0, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234");
+pile.add(0, "images/carte1.jpg", "10", "10", "10", "01234567890123", "012345678901234");
 //console.log(pile.toString()); // to display log
 var mainBoard = new Plateau(gameName, 0, 0); // init the gomas Plateau
 mainBoard.create(8, 4); // create all cases
-mainBoard.add(3, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
-mainBoard.add(4, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
-mainBoard.add(16, "darth-vader.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(3, "images/carte2.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(4, "images/carte3.png", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(7, "images/carte4.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(9, "images/carte5.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(12, "images/carte6.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(14, "images/carte7.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
+mainBoard.add(16, "images/carte8.jpg", "10", "10", "10", "01234567890123", "012345678901234"); // add a carte number 3 to plateau and display it
 mainBoard.setVisibility(false);
 //console.log(mainBoard.toString()); // to display log
 var endTurnB = new gomassButton(820,460, "button", "end turn");
