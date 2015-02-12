@@ -149,20 +149,26 @@ io.on('connection', function (socket) {
         validated: "You join the game : " + game.name,
         game: game.name,
         index: game.idx,
-        first: firstPlayer
+        first: firstPlayer,
+        player1: allGames[idx].player1,
+        player2: allGames[idx].player2
       });
       socket.emit('startgame', {
         validated: "The game start now. : " + game.name,
         game: game.name,
         index: game.idx,
-        first: firstPlayer
+        first: firstPlayer,
+        player1: allGames[idx].player1,
+        player2: allGames[idx].player2
       });
       // answer in the game
       socket.broadcast.to(game.name).emit('startgame', {
         validated: "The game start now. : " + game.name,
         game: game.name,
         index: game.idx,
-        first: firstPlayer
+        first: firstPlayer,
+        player1: allGames[idx].player1,
+        player2: allGames[idx].player2
       });
       // answer for all other
       socket.broadcast.emit('closegame', {
