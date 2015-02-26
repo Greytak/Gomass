@@ -1,0 +1,55 @@
+--------------------------------------------
+GOMASS :
+--------------------------------------------
+--------------------------------------------
+--------------------------------------------
+summon card (hand_src, board_dst)
+- server 1 (ok), send 2 (card_name, board_dst)
+- player 1 ok : remove hand_src, add board_dst
+- player 2 : add board2_dst
+--------------------------------------------
+atk card (board_src, board_dst) (board_src, player2)
+- server 1 (ok), send 2 ()
+
+--------------------------------------------
+--------------------------------------------
+connect, join (create) room
+
+--------------------------------------------
+SERVER
+--------------------------------------------
+party
+
+Hand 1-2 card_pointer,
+
+Board 1-2 card_pointer/null
+
+Player 1-2 mana, life
+
+Deck 1-2 card_name,
+--------------------------------------------
+function card() {
+
+}
+--------------------------------------------
+CLIENT
+--------------------------------------------
+Hand card_pointer,
+--------------------------------------------
+hand.add(card_soldat())
+function card() {
+
+}
+--------------------------------------------
+summon(index_hand_src, index_board_dst) ;
+  hand[index_hand_src].remove_card()
+  board[index_board_dst].card= hand[index_hand_src].card
+  board[index_board_dst].display_card()
+  hand[index_hand_src].card= null
+--------------------------------------------
+
+
+
+
+
+--------------------------------------------

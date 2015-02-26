@@ -1,0 +1,74 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Gomass Luton</title>
+</head>
+<body>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+//var socket = io();
+
+var canvas = document.createElement('canvas');
+canvas.id     = "canvas";//+i+"-"+j;
+canvas.width  = 100;
+canvas.height = 150;
+canvas.style.zIndex   = 8;
+canvas.style.position = "absolute";
+canvas.style.left = 200;
+canvas.style.top = 250;
+canvas.style.border = "1px solid grey";
+//canvas.x = i;
+//canvas.y = j;
+canvas.imagej = new Image();
+canvas.draw = function() {
+  ctx = this.getContext("2d");
+  ctx.beginPath();
+  //ctx.fillStyle = "black";
+  ctx.rect(0, 0, 12, 12);
+  ctx.fillText(" 8", 0, 10);
+  ctx.fillText("Archimage", 22, 10);
+  ctx.rect(87, 138, 12, 12);
+  ctx.fillText(" 8", 87, 148);
+  ctx.rect(0, 138, 12, 12);
+  ctx.fillText(" 8", 0, 148);
+  ctx.fillText(" +1 dégats des sorts", 5, 100);
+  this.imagej.src = 'images/carte1.jpg';
+  ctx.drawImage(this.imagej, 10, 20, 75, 60);
+  ctx.stroke();
+  //ctx.fill();
+};
+document.body.appendChild(canvas);
+canvas.draw();
+
+gomassChat();
+gomassParties()
+
+function gomassChat() {
+  var element = document.createElement("textarea");
+  element.cols = 30;
+  element.rows = 3;
+  element.id = "chatArea";
+  //element.name = "chatArea";
+  //element.readonly = true;
+  element.style.position = "absolute";
+  element.style.left = 50;
+  element.style.top = 50;
+  //element.disabled = false;
+  document.body.appendChild(element);
+  //return element;
+}
+function gomassParties() {
+  var element = document.createElement("select");
+  element.id = "listparties";
+  element.style.position = "absolute";
+  element.style.left = 180;
+  element.style.top = 103;
+  element.onclick = function() {
+    therequest['selected_party'] = this[this.selectedIndex].value;
+  };
+  document.body.appendChild(element);
+}
+</script>
+</html>
