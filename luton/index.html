@@ -8,6 +8,15 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 //-----------------------------------------------------------
+var socket = io.connect('http://localhost:3000');
+//-----------------------------------------------------------
+// send a message to all socket
+socket.on('sendall', function(message) {
+  console.log('sendall');
+  document.getElementById('generalchat').value += message.username + ' : ' + message.message + '\n';
+  document.getElementById('messagechat').value = '';
+})
+//-----------------------------------------------------------
 var grillex = 8;
 var grilley = 2;
 var therequest = {};
@@ -23,7 +32,7 @@ draw_card(570,40,'images/card6.jpg', 83, 149);
 draw_card(680,40,'images/card7.jpg', 88, 149);
 draw_card(790,40,'images/card8.jpg', 91, 149);
 //create_canvas();
-create_generalchat();
+create_chat();
 create_buttons();
 create_listparties();
 create_buttons_party();
@@ -53,34 +62,78 @@ function draw_card(x, y, image_path, imgx, imgy) {
   //canvas.x = i; //canvas.y = j;
   canvas.imagej = new Image();
 
-  ctx = canvas.getContext("2d");
-  ctx.beginPath();
+  var ctx = canvas.getContext("2d");
 
   canvas.imagej.src = image_path;
-  ctx.drawImage(canvas.imagej, 5, 1, imgx, imgy);
-  ctx.stroke();
-  ctx.rect(0, 0, 12, 12);
-  my_draw_text('8', 0, 10, ctx)
-  my_draw_text('Archimage', 22, 10, ctx)
+  canvas.imagej.onload = function(){
+    ctx.drawImage(canvas.imagej, 5, 1, imgx, imgy);
+    ctx.stroke();
 
-  ctx.rect(87, 138, 12, 12);
-  my_draw_text('8', 87, 148, ctx)
-  ctx.rect(0, 138, 12, 12);
-  my_draw_text('8', 0, 148, ctx)
-  my_draw_text(' +1 dégats des sorts', 5, 100, ctx)
+    //ctx.beginPath();
+    ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text('8', 3, 9, ctx)
+    my_draw_text('Archimage', 22, 10, ctx)
+
+    ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text('8', 90, 147, ctx)
+    ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text('8', 3, 147, ctx)
+    my_draw_text(' +1 dégats des sorts', 5, 100, ctx)
+  }
 
   document.body.appendChild(canvas);
 }
 //-----------------------------------------------------------
-function create_generalchat() {
+function create_chat() {
+  var element = document.createElement("textarea");
+  element.id = "roomchat";
+  element.readonly = true;
+  element.cols = 15;
+  element.rows = 3;
+  element.style.position = "absolute";
+  element.style.left = 700;
+  element.style.top = 303;
+  document.body.appendChild(element);
   var element = document.createElement("textarea");
   element.id = "generalchat";
   element.readonly = true;
   element.cols = 15;
   element.rows = 3;
   element.style.position = "absolute";
-  element.style.left = 580;
+  element.style.left = 550;
   element.style.top = 303;
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.id = "messagechat";
+  element.size = 12;
+  element.style.position = "absolute";
+  element.style.left = 270;
+  element.style.top = 335;
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.id = "sendroom";
+  element.value = "sendroom";
+  element.style.position = "absolute";
+  element.style.left = 380;
+  element.style.top = 335;
+  element.onclick = function() {
+    //goajaxrequete();
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.id = "sendall";
+  element.value = "sendall";
+  element.style.position = "absolute";
+  element.style.left = 460;
+  element.style.top = 335;
+  element.onclick = function() {
+    socket.emit('sendall', {
+        message: document.getElementById('messagechat').value,
+        player: 'rrrrrr'
+    });
+  }
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------

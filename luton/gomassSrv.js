@@ -12,5 +12,20 @@ server.listen(port, function () {
 app.use(express.static(__dirname));
 
 io.on('connection', function(socket){
-  console.log('a user connected');
+  console.log('io.on connection');
+
+  socket.on('sendall', function (data) {
+    console.log('socket.on sendall');
+    // send a message to all socket exept the sender
+    socket.broadcast.emit('sendall', {
+      username: data.player,
+      message: data.message
+    });
+    // send the message only to the sender
+    socket.emit('sendall', {
+      username: data.player,
+      message: data.message
+    });
+  });
+
 });
