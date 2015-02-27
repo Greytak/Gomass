@@ -18,12 +18,12 @@ io.on('connection', function(socket){
     console.log('socket.on sendall');
     // send a message to all socket exept the sender
     socket.broadcast.emit('sendall', {
-      username: data.player,
+      login: data.login,
       message: data.message
     });
     // send the message only to the sender
     socket.emit('sendall', {
-      username: data.player,
+      login: data.login,
       message: data.message
     });
   });

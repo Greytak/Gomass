@@ -10,10 +10,10 @@
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
-// send a message to all socket
+// ask server to send a message to all socket
 socket.on('sendall', function(message) {
   console.log('sendall');
-  document.getElementById('generalchat').value += message.username + ' : ' + message.message + '\n';
+  document.getElementById('generalchat').value += message.login + ' : ' + message.message + '\n';
   document.getElementById('messagechat').value = '';
 })
 //-----------------------------------------------------------
@@ -32,6 +32,7 @@ draw_card(570,40,'images/card6.jpg', 83, 149);
 draw_card(680,40,'images/card7.jpg', 88, 149);
 draw_card(790,40,'images/card8.jpg', 91, 149);
 //create_canvas();
+create_login();
 create_chat();
 create_buttons();
 create_listparties();
@@ -84,6 +85,23 @@ function draw_card(x, y, image_path, imgx, imgy) {
   document.body.appendChild(canvas);
 }
 //-----------------------------------------------------------
+function create_login() {
+  var element = document.createElement("span");
+  element.style.position = "absolute";
+  element.style.left = 3;
+  element.style.top = 333;
+  element.innerHTML = 'login ';
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.id = 'login';
+  element.value= getName(6, 6, '', '');
+  element.size = 6;
+  element.style.position = "absolute";
+  element.style.left = 45;
+  element.style.top = 333;
+  document.body.appendChild(element);
+}
+//-----------------------------------------------------------
 function create_chat() {
   var element = document.createElement("textarea");
   element.id = "roomchat";
@@ -131,7 +149,7 @@ function create_chat() {
   element.onclick = function() {
     socket.emit('sendall', {
         message: document.getElementById('messagechat').value,
-        player: 'rrrrrr'
+        login: document.getElementById('login').value
     });
   }
   document.body.appendChild(element);
@@ -215,6 +233,73 @@ function create_buttons_party() {
 }
 //-----------------------------------------------------------
 
+
+
+
+
+
+
+//-----------------------------------------------------------
+//random name generator from
+//http://leapon.net/files/namegen.html
+//-----------------------------------------------------------
+function rnd(minv, maxv){
+  if (maxv < minv) return 0;
+  return Math.floor(Math.random()*(maxv-minv+1)) + minv;
+}
+
+function getName(minlength, maxlength, prefix, suffix)
+{
+  prefix = prefix || '';
+  suffix = suffix || '';
+  //these weird character sets are intended to cope with the nature of English (e.g. char 'x' pops up less frequently than char 's')
+  //note: 'h' appears as consonants and vocals
+  var vocals = 'aeiouyh' + 'aeiou' + 'aeiou';
+  var cons = 'bcdfghjklmnpqrstvwxz' + 'bcdfgjklmnprstvw' + 'bcdfgjklmnprst';
+  var allchars = vocals + cons;
+  //minlength += prefix.length;
+  //maxlength -= suffix.length;
+  var length = rnd(minlength, maxlength) - prefix.length - suffix.length;
+  if (length < 1) length = 1;
+  //alert(minlength + ' ' + maxlength + ' ' + length);
+  var consnum = 0;
+  //alert(prefix);
+  /*if ((prefix.length > 1) && (cons.indexOf(prefix[0]) != -1) && (cons.indexOf(prefix[1]) != -1)) {
+    //alert('a');
+    consnum = 2;
+  }*/
+  if (prefix.length > 0) {
+    for (var i = 0; i < prefix.length; i++) {
+      if (consnum == 2) consnum = 0;
+      if (cons.indexOf(prefix[i]) != -1) {
+        consnum++;
+      }
+    }
+  }
+  else {
+    consnum = 1;
+  }
+
+  var name = prefix;
+
+  for (var i = 0; i < length; i++)
+  {
+    //if we have used 2 consonants, the next char must be vocal.
+    if (consnum == 2)
+    {
+      touse = vocals;
+      consnum = 0;
+    }
+    else touse = allchars;
+    //pick a random character from the set we are goin to use.
+    c = touse.charAt(rnd(0, touse.length - 1));
+    name = name + c;
+    if (cons.indexOf(c) != -1) consnum++;
+  }
+  name = name.charAt(0).toUpperCase() + name.substring(1, name.length) + suffix;
+  return name;
+}
+//-----------------------------------------------------------
 
 
 
