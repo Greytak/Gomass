@@ -10,10 +10,15 @@
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
-// display sender login and chat messgae
+// display sender login and chat message to all or to the room
 socket.on('sendall', function(data) {
   console.log('sendall');
   document.getElementById('generalchat').value += data.login + ' : ' + data.message + '\n';
+  document.getElementById('messagechat').value = '';
+})
+socket.on('sendroom', function(data) {
+  console.log('sendroom');
+  document.getElementById('roomchat').value += data.login + ' : ' + data.message + '\n';
   document.getElementById('messagechat').value = '';
 })
 //-----------------------------------------------------------
@@ -154,6 +159,11 @@ function create_chat() {
   element.style.left = 380;
   element.style.top = 335;
   element.onclick = function() {
+    // ask server to send a chat message to the room
+    socket.emit('sendroom', {
+        message: document.getElementById('messagechat').value,
+        login: document.getElementById('login').value
+    });
   }
   document.body.appendChild(element);
   var element = document.createElement("input");
@@ -204,6 +214,7 @@ function create_buttons() {
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
+  element.disabled = true;
   element.value = "reset";
   element.id = "resetgame";
   element.style.position = "absolute";
@@ -245,6 +256,7 @@ function create_buttons_party() {
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
+  element.disabled = true;
   element.value = "quit";
   element.id = "quitparty";
   element.style.position = "absolute";
@@ -278,17 +290,6 @@ function create_buttons_party() {
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------
-/*
-therequest['selected_party'] = this[this.selectedIndex].value;
-
-var option = document.createElement("option");
-option.value = data.partie_name;
-option.innerHTML = data.partie_name;
-if (data.login==document.getElementById('login').value) option.selected = true;
-document.getElementById("listparties").appendChild(option);
-*/
-
-
 
 
 

@@ -48,6 +48,20 @@ io.on('connection', function(socket){
     });
   });
   //-----------------------------------------------------------
+  socket.on('sendroom', function (data) {
+    console.log('socket.on sendroom');
+    // send a message to the room socket.game exept the sender
+    socket.broadcast.to(socket.game).emit('sendroom', {
+      login: data.login,
+      message: data.message
+    });
+    // send the message only to the sender
+    socket.emit('sendroom', {
+      login: data.login,
+      message: data.message
+    });
+  });
+  //-----------------------------------------------------------
   socket.on('sendall', function (data) {
     console.log('socket.on sendall');
     // send a message to all socket exept the sender
