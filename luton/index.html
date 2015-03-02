@@ -10,11 +10,26 @@
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
-// ask server to send a message to all socket
-socket.on('sendall', function(message) {
+// display sender login and chat messgae
+socket.on('sendall', function(data) {
   console.log('sendall');
-  document.getElementById('generalchat').value += message.login + ' : ' + message.message + '\n';
+  document.getElementById('generalchat').value += data.login + ' : ' + data.message + '\n';
   document.getElementById('messagechat').value = '';
+})
+//-----------------------------------------------------------
+// add partie_name to select 'listparties' and select it if you are the creator
+socket.on('createparty', function(data) {
+  console.log('createparty '+data.partie_name);
+  var option = document.createElement("option");
+  option.value = data.partie_name;
+  option.innerHTML = data.partie_name;
+  if (data.login==document.getElementById('login').value) option.selected = true;
+  document.getElementById("listparties").appendChild(option);
+})
+//-----------------------------------------------------------
+// add partie_name to select 'listparties' and select it if you are the creator
+socket.on('joinparty', function(data) {
+  console.log('joinparty '+data.partie_name);
 })
 //-----------------------------------------------------------
 var grillex = 8;
@@ -40,6 +55,9 @@ create_buttons_party();
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 //-----------------------------------------------------------
+function create_image() {
+
+}
 //-----------------------------------------------------------
 function my_draw_text(text, x, y, context) {
   //display a text in black with a white outline
@@ -136,7 +154,6 @@ function create_chat() {
   element.style.left = 380;
   element.style.top = 335;
   element.onclick = function() {
-    //goajaxrequete();
   }
   document.body.appendChild(element);
   var element = document.createElement("input");
@@ -147,6 +164,7 @@ function create_chat() {
   element.style.left = 460;
   element.style.top = 335;
   element.onclick = function() {
+    // ask server to send a chat message to all socket
     socket.emit('sendall', {
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
@@ -159,11 +177,14 @@ function create_listparties() {
   var element = document.createElement("select");
   element.id = "listparties";
   element.style.position = "absolute";
-  element.style.left = 480;
+  element.style.left = 460;
   element.style.top = 303;
   element.onclick = function() {
     therequest['selected_party'] = this[this.selectedIndex].value;
   };
+  //add an empty option
+  var option = document.createElement("option");
+  element.appendChild(option);
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------
@@ -175,8 +196,10 @@ function create_buttons() {
   element.style.left = 80;
   element.style.top = 303;
   element.onclick = function() {
-    therequest["command"] = "endturn";
-    goajaxrequete();
+    socket.emit('turnswap', {
+        message: document.getElementById('messagechat').value,
+        login: document.getElementById('login').value
+    });
   }
   document.body.appendChild(element);
   var element = document.createElement("input");
@@ -187,8 +210,10 @@ function create_buttons() {
   element.style.left = 3;
   element.style.top = 303;
   element.onclick = function() {
-    therequest["command"] = "resetgame";
-    goajaxrequete();
+    socket.emit('resetgame', {
+        message: document.getElementById('messagechat').value,
+        login: document.getElementById('login').value
+    });
   }
   document.body.appendChild(element);
 }
@@ -196,42 +221,72 @@ function create_buttons() {
 function create_buttons_party() {
   var element = document.createElement("input");
   element.type = "button";
-  element.value = "join";
-  element.id = "joinparty";
-  element.style.position = "absolute";
-  element.style.left = 270;
-  element.style.top = 303;
-  element.onclick = function() {
-    therequest["command"] = "joinparty";
-    goajaxrequete();
-  }
-  document.body.appendChild(element);
-  var element = document.createElement("input");
-  element.type = "button";
   element.value = "create";
   element.id = "createparty";
   element.style.position = "absolute";
-  element.style.left = 330;
+  element.style.left = 230;
   element.style.top = 303;
   element.onclick = function() {
-    therequest["command"] = "createparty";
-    goajaxrequete();
+    console.log('createparty click');
+    if (document.getElementById('partie_name').value=='')
+      document.getElementById('partie_name').value= getName(6, 6, '', '');
+    socket.emit('createparty', {
+      partie_name: document.getElementById('partie_name').value,
+      login: document.getElementById('login').value
+    });
   }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.id = 'partie_name';
+  element.size = 6;
+  element.style.position = "absolute";
+  element.style.left = 290;
+  element.style.top = 303;
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
   element.value = "quit";
   element.id = "quitparty";
   element.style.position = "absolute";
+  element.style.left = 360;
+  element.style.top = 303;
+  element.onclick = function() {
+    console.log('quitparty click');
+    socket.emit('quitparty', {
+        message: document.getElementById('messagechat').value,
+        login: document.getElementById('login').value
+    });
+  }
+  document.body.appendChild(element);
+  var element = document.createElement("input");
+  element.type = "button";
+  element.value = "join";
+  element.id = "joinparty";
+  element.style.position = "absolute";
   element.style.left = 410;
   element.style.top = 303;
   element.onclick = function() {
-    therequest["command"] = "quitparty";
-    goajaxrequete();
+    var listparties= document.getElementById("listparties");
+    var partie_name= listparties[listparties.selectedIndex].value;
+    console.log('joinparty click '+partie_name);
+    if (partie_name!='')
+      socket.emit('joinparty', {
+        partie_name: partie_name,
+        login: document.getElementById('login').value
+      });
   }
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------
+/*
+therequest['selected_party'] = this[this.selectedIndex].value;
+
+var option = document.createElement("option");
+option.value = data.partie_name;
+option.innerHTML = data.partie_name;
+if (data.login==document.getElementById('login').value) option.selected = true;
+document.getElementById("listparties").appendChild(option);
+*/
 
 
 
