@@ -3,10 +3,12 @@
   <meta charset="utf-8">
   <title>Gomass</title>
 </head>
-<body>
-</body>
+<body></body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+//-----------------------------------------------------------
+// ensure all images are loaded then start the game
+preloadimages();
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
@@ -43,25 +45,34 @@ var therequest = {};
 var canvas_source = "";
 var canvas_destination = "";
 //-----------------------------------------------------------
-draw_card(20,40,'images/card1.jpg', 89, 149);
-draw_card(130,40,'images/card2.jpg', 73, 146);
-draw_card(240,40,'images/card3.jpg', 89, 146);
-draw_card(350,40,'images/card4.jpg', 89, 146);
-draw_card(460,40,'images/card5.jpg', 100, 149);
-draw_card(570,40,'images/card6.jpg', 83, 149);
-draw_card(680,40,'images/card7.jpg', 88, 149);
-draw_card(790,40,'images/card8.jpg', 91, 149);
-//create_canvas();
-create_login();
-create_chat();
-create_buttons();
-create_listparties();
-create_buttons_party();
+function preloadimages() {
+  cardimages=[];
+  loaded_images= 0;
+  for (var i=1; i<9; i++) {
+    cardimages[i]= new Image();
+    cardimages[i].src= 'images/card'+i+'.jpg';
+    cardimages[i].onload= function() {
+      loaded_images++;
+      if (loaded_images==8) after_images_loaded();
+    }
+  }
+}
 //-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-function create_image() {
-
+function after_images_loaded() {
+  //draw_card(x,y,image_num, width, height);
+  draw_card(20,5,1, 89, 149);
+  draw_card(130,5,2, 73, 146);
+  draw_card(240,5,3, 89, 146);
+  draw_card(350,5,4, 89, 146);
+  draw_card(460,5,5, 100, 149);
+  draw_card(570,5,6, 83, 149);
+  draw_card(680,5,7, 88, 149);
+  draw_card(790,5,8, 91, 149);
+  create_login();
+  create_chat();
+  create_buttons();
+  create_listparties();
+  create_buttons_party();
 }
 //-----------------------------------------------------------
 function my_draw_text(text, x, y, context) {
@@ -73,7 +84,7 @@ function my_draw_text(text, x, y, context) {
   context.fillText(text, x, y);
 }
 //-----------------------------------------------------------
-function draw_card(x, y, image_path, imgx, imgy) {
+function draw_card(x, y, image_num, imgx, imgy) {
   var canvas = document.createElement('canvas');
   //canvas.id     = "canvas"+i+"-"+j;
   canvas.width  = 100;
@@ -84,26 +95,19 @@ function draw_card(x, y, image_path, imgx, imgy) {
   canvas.style.top = y;
   canvas.style.border = "1px solid grey";
   //canvas.x = i; //canvas.y = j;
-  canvas.imagej = new Image();
-
   var ctx = canvas.getContext("2d");
+  ctx.drawImage(cardimages[image_num], 5, 1, imgx, imgy);
+  ctx.stroke();
 
-  canvas.imagej.src = image_path;
-  canvas.imagej.onload = function(){
-    ctx.drawImage(canvas.imagej, 5, 1, imgx, imgy);
-    ctx.stroke();
+  ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+  my_draw_text('8', 3, 9, ctx)
+  my_draw_text('Archimage', 22, 10, ctx)
 
-    //ctx.beginPath();
-    ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text('8', 3, 9, ctx)
-    my_draw_text('Archimage', 22, 10, ctx)
-
-    ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text('8', 90, 147, ctx)
-    ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text('8', 3, 147, ctx)
-    my_draw_text(' +1 dégats des sorts', 5, 100, ctx)
-  }
+  ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+  my_draw_text('8', 90, 147, ctx)
+  ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+  my_draw_text('8', 3, 147, ctx)
+  my_draw_text(' +1 dégats des sorts', 5, 100, ctx)
 
   document.body.appendChild(canvas);
 }
