@@ -60,14 +60,16 @@ function preloadimages() {
 //-----------------------------------------------------------
 function after_images_loaded() {
   //draw_card(x,y,image_num);
-  draw_card(20,5,1);
-  draw_card(130,5,2);
-  draw_card(240,5,3);
-  draw_card(350,5,4);
-  draw_card(460,5,5);
-  draw_card(570,5,6);
-  draw_card(680,5,7);
-  draw_card(790,5,8);
+  draw_card(20,10,1);
+  draw_card(130,10,2);
+  draw_card(240,10,3);
+  draw_card(350,10,4);
+  draw_card(460,10,5);
+  draw_card(570,10,6);
+  draw_card(680,10,7);
+  draw_card(790,10,8);
+
+  draw_card(20,171,6);
   create_login();
   create_chat();
   create_buttons();
@@ -116,7 +118,7 @@ function create_login() {
   var element = document.createElement("span");
   element.style.position = "absolute";
   element.style.left = 3;
-  element.style.top = 333;
+  element.style.top = 364;
   element.innerHTML = 'login ';
   document.body.appendChild(element);
   var element = document.createElement("input");
@@ -125,7 +127,7 @@ function create_login() {
   element.size = 6;
   element.style.position = "absolute";
   element.style.left = 45;
-  element.style.top = 333;
+  element.style.top = 364;
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------
@@ -137,7 +139,7 @@ function create_chat() {
   element.rows = 3;
   element.style.position = "absolute";
   element.style.left = 700;
-  element.style.top = 303;
+  element.style.top = 334;
   document.body.appendChild(element);
   var element = document.createElement("textarea");
   element.id = "generalchat";
@@ -146,14 +148,14 @@ function create_chat() {
   element.rows = 3;
   element.style.position = "absolute";
   element.style.left = 550;
-  element.style.top = 303;
+  element.style.top = 334;
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.id = "messagechat";
   element.size = 12;
   element.style.position = "absolute";
   element.style.left = 270;
-  element.style.top = 335;
+  element.style.top = 366;
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
@@ -161,7 +163,7 @@ function create_chat() {
   element.value = "sendroom";
   element.style.position = "absolute";
   element.style.left = 380;
-  element.style.top = 335;
+  element.style.top = 366;
   element.onclick = function() {
     // ask server to send a chat message to the room
     socket.emit('sendroom', {
@@ -176,7 +178,7 @@ function create_chat() {
   element.value = "sendall";
   element.style.position = "absolute";
   element.style.left = 460;
-  element.style.top = 335;
+  element.style.top = 366;
   element.onclick = function() {
     // ask server to send a chat message to all socket
     socket.emit('sendall', {
@@ -192,7 +194,7 @@ function create_listparties() {
   element.id = "listparties";
   element.style.position = "absolute";
   element.style.left = 460;
-  element.style.top = 303;
+  element.style.top = 334;
   element.onclick = function() {
     therequest['selected_party'] = this[this.selectedIndex].value;
   };
@@ -208,7 +210,7 @@ function create_buttons() {
   element.id = "turnswap";
   element.style.position = "absolute";
   element.style.left = 80;
-  element.style.top = 303;
+  element.style.top = 334;
   element.onclick = function() {
     socket.emit('turnswap', {
         message: document.getElementById('messagechat').value,
@@ -223,7 +225,7 @@ function create_buttons() {
   element.id = "resetgame";
   element.style.position = "absolute";
   element.style.left = 3;
-  element.style.top = 303;
+  element.style.top = 334;
   element.onclick = function() {
     socket.emit('resetgame', {
         message: document.getElementById('messagechat').value,
@@ -240,7 +242,7 @@ function create_buttons_party() {
   element.id = "createparty";
   element.style.position = "absolute";
   element.style.left = 230;
-  element.style.top = 303;
+  element.style.top = 334;
   element.onclick = function() {
     console.log('createparty click');
     if (document.getElementById('partie_name').value=='')
@@ -256,7 +258,7 @@ function create_buttons_party() {
   element.size = 6;
   element.style.position = "absolute";
   element.style.left = 290;
-  element.style.top = 303;
+  element.style.top = 334;
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
@@ -265,7 +267,7 @@ function create_buttons_party() {
   element.id = "quitparty";
   element.style.position = "absolute";
   element.style.left = 360;
-  element.style.top = 303;
+  element.style.top = 334;
   element.onclick = function() {
     console.log('quitparty click');
     socket.emit('quitparty', {
@@ -280,7 +282,7 @@ function create_buttons_party() {
   element.id = "joinparty";
   element.style.position = "absolute";
   element.style.left = 410;
-  element.style.top = 303;
+  element.style.top = 334;
   element.onclick = function() {
     var listparties= document.getElementById("listparties");
     var partie_name= listparties[listparties.selectedIndex].value;
