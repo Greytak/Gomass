@@ -48,18 +48,36 @@ var canvas_destination = "";
 function preloadimages() {
   cardimages=[];
   loaded_images= 0;
-  for (var i=1; i<9; i++) {
+  for (var i=1; i<10; i++) {
     cardimages[i]= new Image();
     cardimages[i].src= 'images/card'+i+'.jpg';
     cardimages[i].onload= function() {
       loaded_images++;
-      if (loaded_images==8) after_images_loaded();
+      if (loaded_images==9) after_images_loaded();
     }
   }
 }
 //-----------------------------------------------------------
 function after_images_loaded() {
   //draw_card(x,y,image_num);
+  draw_card(20,10,1);
+  draw_card(130,10,2);
+  draw_card(20,171,6);
+  draw_card(130,171,2);
+
+  draw_card(260,10,8);
+  draw_card(260,171,9);
+
+  draw_card(390,10,4);
+  draw_card(500,10,5);
+  draw_card(610,10,6);
+  draw_card(720,10,7);
+  draw_card(390,171,2);
+  draw_card(500,171,4);
+  draw_card(610,171,5);
+  draw_card(720,171,6);
+
+/*
   draw_card(20,10,1);
   draw_card(130,10,2);
   draw_card(240,10,3);
@@ -70,6 +88,10 @@ function after_images_loaded() {
   draw_card(790,10,8);
 
   draw_card(20,171,6);
+  draw_card(130,171,9);
+  */
+
+
   create_login();
   create_chat();
   create_buttons();

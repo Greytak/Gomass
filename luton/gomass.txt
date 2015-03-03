@@ -1,6 +1,14 @@
 --------------------------------------------
 GOMASS :
 --------------------------------------------
+liste of card
+
+second join game => start game :
+  random first player ; create random hand cards, +1 first ;
+sendhand()-send_card() .. display_hand()
+
+
+
 --------------------------------------------
 --------------------------------------------
 summon card (hand_src, board_dst)
