@@ -34,9 +34,12 @@ socket.on('createparty', function(data) {
   document.getElementById("listparties").appendChild(option);
 })
 //-----------------------------------------------------------
-// init game display player card
+// init game display player cards
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
+  // display players's cards
+  draw_card(coord_player[1][0],coord_player[1][1],data.my_card);
+  draw_card(coord_player[0][0],coord_player[0][1],data.other_card);
   // display hand
   var i= 0;
   for (card of data.hand) {
@@ -45,9 +48,6 @@ socket.on('joinparty', function(data) {
   }
 })
 //-----------------------------------------------------------
-var grillex = 8;
-var grilley = 2;
-var therequest = {};
 var canvas_source = "";
 var canvas_destination = "";
 //-----------------------------------------------------------
@@ -69,16 +69,6 @@ function after_images_loaded() {
   coord_player= [[260,10],[260,171]];
   coord_board1= [[390,10],[500,10],[610,10],[720,10]];
   coord_board2= [[390,171],[500,171],[610,171],[720,171]];
-  //draw_card(x,y,image_num);
-  /*draw_card(20,10,1); draw_card(130,10,2);
-  draw_card(20,171,3); draw_card(130,171,2);
-
-  draw_card(260,10,8); draw_card(260,171,9);
-
-  draw_card(390,10,4); draw_card(500,10,5);
-  draw_card(610,10,6); draw_card(720,10,7);
-  draw_card(390,171,2); draw_card(500,171,4);
-  draw_card(610,171,5); draw_card(720,171,6);*/
 
   create_login();
   create_chat();
@@ -206,7 +196,7 @@ function create_listparties() {
   element.style.left = 460;
   element.style.top = 334;
   element.onclick = function() {
-    therequest['selected_party'] = this[this.selectedIndex].value;
+    //therequest['selected_party'] = this[this.selectedIndex].value;
   };
   //add an empty option
   var option = document.createElement("option");
@@ -381,7 +371,7 @@ function getName(minlength, maxlength, prefix, suffix)
 
 //-----------------------------------------------------------
 //-----------------------------------------------------------
-function fill_listparties() {
+/*function fill_listparties() {
   var listparties = document.getElementById("listparties");
   listparties.innerHTML = "";
   if (typeof php_json['partiesarray'] != 'undefined') {//??
@@ -394,118 +384,7 @@ function fill_listparties() {
       listparties.appendChild(option);
     }
   }
-}
-//-----------------------------------------------------------
-function goajaxrequete()
-{
-  if (typeof myTimeout != 'undefined')
-    clearTimeout(myTimeout);
-  str_json= JSON.stringify(therequest);
-  console.log(str_json);
-  var xmlhttp=new XMLHttpRequest();
-  xmlhttp.onreadystatechange=function() {
-    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-      tmpresp= xmlhttp.responseText;
-      //console.log("tt--"+tmpresp+"--tt");
-      processajaxresponse();
-    } else {
-      //console.log('wrong');
-    }
-  }
-  xmlhttp.open("POST", "gomass.php", true)
-  xmlhttp.setRequestHeader("Content-type", "application/json")
-  xmlhttp.send(str_json);
-}
-//-----------------------------------------------------------
-function create_canvas() {
-  for (i = 0; i < grillex; i++) {
-    for (j = 0; j < grilley; j++) {
-      var canvas = document.createElement('canvas');
-      canvas.id     = "canvas"+i+"-"+j;
-      canvas.width  = 100;
-      canvas.height = 150;
-      canvas.style.zIndex   = 8;
-      canvas.style.position = "absolute";
-      canvas.style.left = i*100;
-      canvas.style.top = j*150;
-      canvas.style.border = "1px solid grey";
-      canvas.x = i;
-      canvas.y = j;
-      canvas.imagej = new Image();
-      canvas.onclick = function() {
-        //if (this.imagej.src!='') {
-        if (php_json["theparty"]['grille'][this.x][this.y]['carte']==1) {
-          canvas_source= this.id;
-        }
-        else {
-          therequest["command"] = "gomove";
-          therequest["desx"] = this.x;
-          therequest["desy"] = this.y;
-          canvas_destination= this.id;
-          canvas_tmp = document.getElementById(canvas_source);
-          therequest["srcx"] = canvas_tmp.x;
-          therequest["srcy"] = canvas_tmp.y;
-          goajaxrequete();
-        }
-      };
-      canvas.clear = function() {
-        ctx = this.getContext("2d");
-        ctx.clearRect(0, 0, 100, 150);
-      };
-      canvas.draw = function() {
-        ctx = this.getContext("2d");
-        ctx.beginPath();
-        //ctx.fillStyle = "black";
-        ctx.rect(0, 0, 12, 12);
-        ctx.fillText(" 8", 0, 10);
-        ctx.fillText("Archimage", 22, 10);
-        ctx.rect(87, 138, 12, 12);
-        ctx.fillText(" 8", 87, 148);
-        ctx.rect(0, 138, 12, 12);
-        ctx.fillText(" 8", 0, 148);
-        ctx.fillText(" +1 dégats des sorts", 5, 100);
-        this.imagej.src = 'images/carte1.jpg';
-        ctx.drawImage(this.imagej, 10, 20, 75, 60);
-        ctx.stroke();
-        //ctx.fill();
-      };
-      document.body.appendChild(canvas);
-    }
-  }
-}
-//-----------------------------------------------------------
-function tteessttoo() {
-  var canvas = document.createElement('canvas');
-  canvas.id     = "canvas"+i+"-"+j;
-  canvas.width  = 100;
-  canvas.height = 150;
-  canvas.style.zIndex   = 8;
-  canvas.style.position = "absolute";
-  canvas.style.left = i*100;
-  canvas.style.top = j*150;
-  canvas.style.border = "1px solid grey";
-  canvas.x = i;
-  canvas.y = j;
-  canvas.imagej = new Image();
-  canvas.draw = function() {
-    ctx = this.getContext("2d");
-    ctx.beginPath();
-    //ctx.fillStyle = "black";
-    ctx.rect(0, 0, 12, 12);
-    ctx.fillText(" 8", 0, 10);
-    ctx.fillText("Archimage", 22, 10);
-    ctx.rect(87, 138, 12, 12);
-    ctx.fillText(" 8", 87, 148);
-    ctx.rect(0, 138, 12, 12);
-    ctx.fillText(" 8", 0, 148);
-    ctx.fillText(" +1 dégats des sorts", 5, 100);
-    this.imagej.src = 'darth-vader.jpg';
-    ctx.drawImage(this.imagej, 10, 20, 75, 60);
-    ctx.stroke();
-    //ctx.fill();
-  };
-  document.body.appendChild(canvas);
-}
+}*/
 //-----------------------------------------------------------
 </script>
 </html>

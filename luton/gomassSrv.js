@@ -12,11 +12,21 @@ server.listen(port, function () {
 app.use(express.static(__dirname));
 //-----------------------------------------------------------
 function Party() {
-  this.deck1= [];  this.deck2= [];
-  this.hand1= [];  this.hand2= [];
+  this.deck1= [];  this.deck2= [];  this.hand1= [];  this.hand2= [];
   this.init = function() {
-    for (var i = 1, l = 3; i < l; i++) this.hand1.push(Math.round(Math.random() * 6 + 1));
-    for (var i = 1, l = 4; i < l; i++) this.hand2.push(Math.round(Math.random() * 6 + 1));
+    // random player begins, has the card n°9 and 3 hand card the other n°8 and 4
+    if (Math.random()<.5) {
+      this.player_turn= this.player1;
+      this.player1card= 9;  this.player2card= 8;
+      for (var i = 1, l = 3; i < l; i++) this.hand1.push(Math.round(Math.random() * 6 + 1));
+      for (var i = 1, l = 4; i < l; i++) this.hand2.push(Math.round(Math.random() * 6 + 1));
+    } else {
+      this.player_turn= this.player2;
+      this.player1card= 8;  this.player2card= 9;
+      for (var i = 1, l = 4; i < l; i++) this.hand1.push(Math.round(Math.random() * 6 + 1));
+      for (var i = 1, l = 3; i < l; i++) this.hand2.push(Math.round(Math.random() * 6 + 1));
+    }
+    // random from 1 to 7 integer deck
     for (var i = 1, l = 90; i < l; i++) {
       this.deck1.push(Math.round(Math.random() * 6 + 1))
       this.deck2.push(Math.round(Math.random() * 6 + 1))
@@ -32,27 +42,33 @@ io.on('connection', function(socket){
   //-----------------------------------------------------------
   //-----------------------------------------------------------
   socket.on('joinparty', function (data) {
-    console.log('socket.on joinparty '+data.party_name);
+    console.log('socket.on joinparty '+data.party_name+ ' id '+ socket.id);
     socket.game = data.party_name;
     socket.join(data.party_name);
-    game= new Party();
+    game.player2= socket.id;
     game.init();
     // send a message to the room socket.game exept the sender
     socket.broadcast.to(socket.game).emit('joinparty', {
       login: data.login,
       party_name: data.party_name,
-      hand: game.hand1
+      hand: game.hand1,
+      my_card: game.player1card,
+      other_card: game.player2card
     });
     // send joinparty only to the sender
     socket.emit('joinparty', {
       login: data.login,
       party_name: data.party_name,
-      hand: game.hand2
+      hand: game.hand2,
+      my_card: game.player2card,
+      other_card: game.player1card
     });
   });
   //-----------------------------------------------------------
   socket.on('createparty', function (data) {
-    console.log('socket.on createparty '+data.party_name);
+    console.log('socket.on createparty '+data.party_name+ ' id '+ socket.id);
+    game= new Party();
+    game.player1= socket.id;
     socket.game = data.party_name;
     socket.join(data.party_name);
     // send createparty to all socket exept the sender
