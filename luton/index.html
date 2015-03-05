@@ -24,19 +24,20 @@ socket.on('sendroom', function(data) {
   document.getElementById('messagechat').value = '';
 })
 //-----------------------------------------------------------
-// add partie_name to select 'listparties' and select it if you are the creator
+// add party_name to select 'listparties' and select it if you are the creator
 socket.on('createparty', function(data) {
-  console.log('createparty '+data.partie_name);
+  console.log('createparty '+data.party_name);
   var option = document.createElement("option");
-  option.value = data.partie_name;
-  option.innerHTML = data.partie_name;
+  option.value = data.party_name;
+  option.innerHTML = data.party_name;
   if (data.login==document.getElementById('login').value) option.selected = true;
   document.getElementById("listparties").appendChild(option);
 })
 //-----------------------------------------------------------
-// add partie_name to select 'listparties' and select it if you are the creator
+// init game display hand, player card
 socket.on('joinparty', function(data) {
-  console.log('joinparty '+data.partie_name);
+  console.log('joinparty '+data.party_name);
+  console.log('hand '+data.hand);
 })
 //-----------------------------------------------------------
 var grillex = 8;
@@ -62,7 +63,7 @@ function after_images_loaded() {
   //draw_card(x,y,image_num);
   draw_card(20,10,1);
   draw_card(130,10,2);
-  draw_card(20,171,6);
+  draw_card(20,171,3);
   draw_card(130,171,2);
 
   draw_card(260,10,8);
@@ -76,21 +77,6 @@ function after_images_loaded() {
   draw_card(500,171,4);
   draw_card(610,171,5);
   draw_card(720,171,6);
-
-/*
-  draw_card(20,10,1);
-  draw_card(130,10,2);
-  draw_card(240,10,3);
-  draw_card(350,10,4);
-  draw_card(460,10,5);
-  draw_card(570,10,6);
-  draw_card(680,10,7);
-  draw_card(790,10,8);
-
-  draw_card(20,171,6);
-  draw_card(130,171,9);
-  */
-
 
   create_login();
   create_chat();
@@ -267,16 +253,16 @@ function create_buttons_party() {
   element.style.top = 334;
   element.onclick = function() {
     console.log('createparty click');
-    if (document.getElementById('partie_name').value=='')
-      document.getElementById('partie_name').value= getName(6, 6, '', '');
+    if (document.getElementById('party_name').value=='')
+      document.getElementById('party_name').value= getName(6, 6, '', '');
     socket.emit('createparty', {
-      partie_name: document.getElementById('partie_name').value,
+      party_name: document.getElementById('party_name').value,
       login: document.getElementById('login').value
     });
   }
   document.body.appendChild(element);
   var element = document.createElement("input");
-  element.id = 'partie_name';
+  element.id = 'party_name';
   element.size = 6;
   element.style.position = "absolute";
   element.style.left = 290;
@@ -307,11 +293,11 @@ function create_buttons_party() {
   element.style.top = 334;
   element.onclick = function() {
     var listparties= document.getElementById("listparties");
-    var partie_name= listparties[listparties.selectedIndex].value;
-    console.log('joinparty click '+partie_name);
-    if (partie_name!='')
+    var party_name= listparties[listparties.selectedIndex].value;
+    console.log('joinparty click '+party_name);
+    if (party_name!='')
       socket.emit('joinparty', {
-        partie_name: partie_name,
+        party_name: party_name,
         login: document.getElementById('login').value
       });
   }

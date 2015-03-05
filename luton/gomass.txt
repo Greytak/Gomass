@@ -1,12 +1,15 @@
 --------------------------------------------
 GOMASS :
 --------------------------------------------
-liste of card
+liste of minion card (7), liste of player card (2)
 
 second join game => start game :
-  random first player ; create random hand cards, +1 first ;
-sendhand()-send_card() .. display_hand()
+  random first player ; random card player
+  create random deck cards ; create hands +1 first
 
+sendhand() {send_card }
+ .. display_hand()
+first-player
 
 
 --------------------------------------------
