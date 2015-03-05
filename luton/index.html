@@ -34,10 +34,15 @@ socket.on('createparty', function(data) {
   document.getElementById("listparties").appendChild(option);
 })
 //-----------------------------------------------------------
-// init game display hand, player card
+// init game display player card
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
-  console.log('hand '+data.hand);
+  // display hand
+  var i= 0;
+  for (card of data.hand) {
+    draw_card(coord_hand[i][0],coord_hand[i][1],card);
+    i++;
+  }
 })
 //-----------------------------------------------------------
 var grillex = 8;
@@ -60,23 +65,20 @@ function preloadimages() {
 }
 //-----------------------------------------------------------
 function after_images_loaded() {
+  coord_hand= [[20,10],[130,10],[20,171],[130,171]];
+  coord_player= [[260,10],[260,171]];
+  coord_board1= [[390,10],[500,10],[610,10],[720,10]];
+  coord_board2= [[390,171],[500,171],[610,171],[720,171]];
   //draw_card(x,y,image_num);
-  draw_card(20,10,1);
-  draw_card(130,10,2);
-  draw_card(20,171,3);
-  draw_card(130,171,2);
+  /*draw_card(20,10,1); draw_card(130,10,2);
+  draw_card(20,171,3); draw_card(130,171,2);
 
-  draw_card(260,10,8);
-  draw_card(260,171,9);
+  draw_card(260,10,8); draw_card(260,171,9);
 
-  draw_card(390,10,4);
-  draw_card(500,10,5);
-  draw_card(610,10,6);
-  draw_card(720,10,7);
-  draw_card(390,171,2);
-  draw_card(500,171,4);
-  draw_card(610,171,5);
-  draw_card(720,171,6);
+  draw_card(390,10,4); draw_card(500,10,5);
+  draw_card(610,10,6); draw_card(720,10,7);
+  draw_card(390,171,2); draw_card(500,171,4);
+  draw_card(610,171,5); draw_card(720,171,6);*/
 
   create_login();
   create_chat();

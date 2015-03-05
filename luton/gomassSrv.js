@@ -38,13 +38,6 @@ io.on('connection', function(socket){
     game= new Party();
     game.init();
     // send a message to the room socket.game exept the sender
-    /*socket.broadcast.to(socket.game).emit('sendroom', {
-      login: data.login,
-      message: data.message
-    });*/
-    // send joinparty to all socket exept the sender
-    //socket.broadcast.emit('joinparty', {
-    // send a message to the room socket.game exept the sender
     socket.broadcast.to(socket.game).emit('joinparty', {
       login: data.login,
       party_name: data.party_name,
