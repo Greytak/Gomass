@@ -12,6 +12,9 @@ preloadimages();
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
+var canvas_source = "";
+var canvas_destination = "";
+//-----------------------------------------------------------
 // display sender login and chat message to all or to the room
 socket.on('sendall', function(data) {
   console.log('sendall');
@@ -48,16 +51,13 @@ socket.on('joinparty', function(data) {
   }
 })
 //-----------------------------------------------------------
-var canvas_source = "";
-var canvas_destination = "";
-//-----------------------------------------------------------
 function preloadimages() {
   cardimages=[];
   loaded_images= 0;
   for (var i=1; i<10; i++) {
-    cardimages[i]= new Image();
-    cardimages[i].src= 'images/card'+i+'.jpg';
-    cardimages[i].onload= function() {
+    cardimages[i-1]= new Image();
+    cardimages[i-1].src= 'images/card'+i+'.jpg';
+    cardimages[i-1].onload= function() {
       loaded_images++;
       if (loaded_images==9) after_images_loaded();
     }
@@ -69,12 +69,29 @@ function after_images_loaded() {
   coord_player= [[260,10],[260,171]];
   coord_board1= [[390,10],[500,10],[610,10],[720,10]];
   coord_board2= [[390,171],[500,171],[610,171],[720,171]];
-
+  create_card();
   create_login();
   create_chat();
   create_buttons();
   create_listparties();
   create_buttons_party();
+}
+//-----------------------------------------------------------
+function create_card() {
+  cards=[];
+  cards.push(new card_model('soldier', 'Ready...', 1, 1, 1, cardimages[0]));
+  cards.push(new card_model('sergeant', 'Yes...', 2, 1, 2, cardimages[1]));
+  cards.push(new card_model('lieutenant', 'Ok...', 3, 2, 2, cardimages[2]));
+  cards.push(new card_model('captain', 'Go...', 4, 2, 3, cardimages[3]));
+  cards.push(new card_model('colonel', 'Prepare...', 5, 3, 3, cardimages[4]));
+  cards.push(new card_model('marshal', 'Think...', 6, 3, 4, cardimages[5]));
+  cards.push(new card_model('general', 'Serve...', 7, 4, 3, cardimages[6]));
+  cards.push(new card_model('player', '', 0, 20, 1, cardimages[7]));
+  cards.push(new card_model('player', '', 0, 20, 1, cardimages[8]));
+}
+function card_model(title_card, text_card, cost, atk, def, image_card) {
+  this.title_card= title_card; this.text_card= text_card; this.cost= cost;
+  this.atk= atk; this.def= def; this.image_card= image_card;
 }
 //-----------------------------------------------------------
 function my_draw_text(text, x, y, context) {
@@ -86,30 +103,27 @@ function my_draw_text(text, x, y, context) {
   context.fillText(text, x, y);
 }
 //-----------------------------------------------------------
-function draw_card(x, y, image_num, imgx, imgy) {
+function draw_card(x, y, card_num) {
   var canvas = document.createElement('canvas');
-  //canvas.id     = "canvas"+i+"-"+j;
-  canvas.width  = 100;
-  canvas.height = 150;
-  canvas.style.zIndex   = 8;
+  canvas.width  = 100;  canvas.height = 150;
   canvas.style.position = "absolute";
   canvas.style.left = x;
   canvas.style.top = y;
   canvas.style.border = "1px solid grey";
-  //canvas.x = i; //canvas.y = j;
   var ctx = canvas.getContext("2d");
-  ctx.drawImage(cardimages[image_num], 5, 1);
+  //console.log('tt '+ card_num +' : '+ typeof(cards[card_num].image_card) + ' - ' + typeof(cardimages[card_num]));
+  ctx.drawImage(cards[card_num].image_card, 1, 1);
   ctx.stroke();
 
   ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-  my_draw_text('8', 3, 9, ctx)
-  my_draw_text('Archimage', 22, 10, ctx)
+  my_draw_text(cards[card_num].cost, 3, 9, ctx)
+  my_draw_text(cards[card_num].title_card, 22, 10, ctx)
 
   ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-  my_draw_text('8', 90, 147, ctx)
+  my_draw_text(cards[card_num].atk, 90, 147, ctx)
   ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-  my_draw_text('8', 3, 147, ctx)
-  my_draw_text(' +1 dégats des sorts', 5, 100, ctx)
+  my_draw_text(cards[card_num].def, 3, 147, ctx)
+  my_draw_text(cards[card_num].text_card, 5, 100, ctx)
 
   document.body.appendChild(canvas);
 }

@@ -17,19 +17,19 @@ function Party() {
     // random player begins, has the card n°9 and 3 hand card the other n°8 and 4
     if (Math.random()<.5) {
       this.player_turn= this.player1;
-      this.player1card= 9;  this.player2card= 8;
-      for (var i = 1, l = 3; i < l; i++) this.hand1.push(Math.round(Math.random() * 6 + 1));
-      for (var i = 1, l = 4; i < l; i++) this.hand2.push(Math.round(Math.random() * 6 + 1));
+      this.player1card= 8;  this.player2card= 7;
+      for (var i = 1, l = 3; i < l; i++) this.hand1.push(Math.round(Math.random() * 6));
+      for (var i = 1, l = 4; i < l; i++) this.hand2.push(Math.round(Math.random() * 6));
     } else {
       this.player_turn= this.player2;
-      this.player1card= 8;  this.player2card= 9;
-      for (var i = 1, l = 4; i < l; i++) this.hand1.push(Math.round(Math.random() * 6 + 1));
-      for (var i = 1, l = 3; i < l; i++) this.hand2.push(Math.round(Math.random() * 6 + 1));
+      this.player1card= 7;  this.player2card= 8;
+      for (var i = 1, l = 4; i < l; i++) this.hand1.push(Math.round(Math.random() * 6));
+      for (var i = 1, l = 3; i < l; i++) this.hand2.push(Math.round(Math.random() * 6));
     }
     // random from 1 to 7 integer deck
     for (var i = 1, l = 90; i < l; i++) {
-      this.deck1.push(Math.round(Math.random() * 6 + 1))
-      this.deck2.push(Math.round(Math.random() * 6 + 1))
+      this.deck1.push(Math.round(Math.random() * 6))
+      this.deck2.push(Math.round(Math.random() * 6))
     }
     console.log('Party init '+this.hand1);
     console.log(this.hand2);
