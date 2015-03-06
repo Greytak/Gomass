@@ -41,8 +41,17 @@ socket.on('createparty', function(data) {
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
   // display players's cards
+  cards[data.my_card].title_card= 'My';
+  cards[data.other_card].title_card= 'Other';
   draw_card(coord_player[1][0],coord_player[1][1],data.my_card);
   draw_card(coord_player[0][0],coord_player[0][1],data.other_card);
+  if (data.myturn) {
+    document.getElementById('turnswap').value= 'end turn';
+    document.getElementById('turnswap').disabled= false;
+  } else {
+    document.getElementById('turnswap').value= 'other turn';
+    document.getElementById('turnswap').disabled= true;
+  }
   // display hand
   var i= 0;
   for (card of data.hand) {

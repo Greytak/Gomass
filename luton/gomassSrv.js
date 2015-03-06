@@ -16,12 +16,12 @@ function Party() {
   this.init = function() {
     // random player begins, has the card n°9 and 3 hand card the other n°8 and 4
     if (Math.random()<.5) {
-      this.player_turn= this.player1;
+      this.player_turn= game.player1;
       this.player1card= 8;  this.player2card= 7;
       for (var i = 1, l = 3; i < l; i++) this.hand1.push(Math.round(Math.random() * 6));
       for (var i = 1, l = 4; i < l; i++) this.hand2.push(Math.round(Math.random() * 6));
     } else {
-      this.player_turn= this.player2;
+      this.player_turn= game.player2;
       this.player1card= 7;  this.player2card= 8;
       for (var i = 1, l = 4; i < l; i++) this.hand1.push(Math.round(Math.random() * 6));
       for (var i = 1, l = 3; i < l; i++) this.hand2.push(Math.round(Math.random() * 6));
@@ -47,10 +47,13 @@ io.on('connection', function(socket){
     socket.join(data.party_name);
     game.player2= socket.id;
     game.init();
+    var sender_turn = false;  var other_turn = false;
+    if (game.player_turn==socket.id) sender_turn= true; else other_turn= true;
     // send a message to the room socket.game exept the sender
     socket.broadcast.to(socket.game).emit('joinparty', {
       login: data.login,
       party_name: data.party_name,
+      myturn: other_turn,
       hand: game.hand1,
       my_card: game.player1card,
       other_card: game.player2card
@@ -59,6 +62,7 @@ io.on('connection', function(socket){
     socket.emit('joinparty', {
       login: data.login,
       party_name: data.party_name,
+      myturn: sender_turn,
       hand: game.hand2,
       my_card: game.player2card,
       other_card: game.player1card
