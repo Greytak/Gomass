@@ -132,6 +132,7 @@ function case_card(left, top, id) {
   canvas.style.border = "1px solid grey";
   document.body.appendChild(canvas);
   this.canvas= document.getElementById(id);
+
   this.draw = function() {
     this.canvas.style.border = "1px solid red";
     var ctx = this.canvas.getContext("2d");
@@ -158,31 +159,6 @@ function my_draw_text(text, x, y, context) {
   context.strokeText(text, x, y);
   context.fillStyle = 'black';
   context.fillText(text, x, y);
-}
-//-----------------------------------------------------------
-function draw_card(x, y, card_num) {
-  var canvas = document.createElement('canvas');
-  canvas.width  = 100;  canvas.height = 150;
-  canvas.style.position = "absolute";
-  canvas.style.left = x;
-  canvas.style.top = y;
-  canvas.style.border = "1px solid red";
-  var ctx = canvas.getContext("2d");
-  //console.log('tt '+ card_num +' : '+ typeof(cards[card_num].image_card) + ' - ' + typeof(cardimages[card_num]));
-  ctx.drawImage(cards[card_num].image_card, 1, 1);
-  ctx.stroke();
-
-  ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-  my_draw_text(cards[card_num].cost, 3, 9, ctx)
-  my_draw_text(cards[card_num].title_card, 22, 10, ctx)
-
-  ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-  my_draw_text(cards[card_num].atk, 90, 147, ctx)
-  ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-  my_draw_text(cards[card_num].def, 3, 147, ctx)
-  my_draw_text(cards[card_num].text_card, 5, 100, ctx)
-
-  document.body.appendChild(canvas);
 }
 //-----------------------------------------------------------
 function create_login() {
