@@ -43,8 +43,11 @@ socket.on('joinparty', function(data) {
   // display players's cards
   cards[data.my_card].title_card= 'My';
   cards[data.other_card].title_card= 'Other';
-  draw_card(coord_player[1][0],coord_player[1][1],data.my_card);
-  draw_card(coord_player[0][0],coord_player[0][1],data.other_card);
+  cases_player[0].card= data.my_card;
+  cases_player[0].draw();
+  cases_player[1].card= data.other_card;
+  cases_player[1].draw();
+  // modify turnswap button
   if (data.myturn) {
     document.getElementById('turnswap').value= 'end turn';
     document.getElementById('turnswap').disabled= false;
@@ -55,7 +58,8 @@ socket.on('joinparty', function(data) {
   // display hand
   var i= 0;
   for (card of data.hand) {
-    draw_card(coord_hand[i][0],coord_hand[i][1],card);
+    cases_hand[i].card= card;
+    cases_hand[i].draw();
     i++;
   }
 })
@@ -74,10 +78,25 @@ function preloadimages() {
 }
 //-----------------------------------------------------------
 function after_images_loaded() {
-  coord_hand= [[20,10],[130,10],[20,171],[130,171]];
-  coord_player= [[260,10],[260,171]];
-  coord_board1= [[390,10],[500,10],[610,10],[720,10]];
-  coord_board2= [[390,171],[500,171],[610,171],[720,171]];
+  cases_hand= [];
+  cases_hand.push(new case_card(20, 10, 'case_hand_0'));
+  cases_hand.push(new case_card(130, 10, 'case_hand_1'));
+  cases_hand.push(new case_card(20, 171, 'case_hand_2'));
+  cases_hand.push(new case_card(130, 171, 'case_hand_3'));
+  cases_player= [];
+  cases_player.push(new case_card(260, 10, 'case_player_0'));
+  cases_player.push(new case_card(260, 171, 'case_player_1'));
+  cases_board1= [];
+  cases_board1.push(new case_card(390, 10, 'case_board1_0'));
+  cases_board1.push(new case_card(500, 10, 'case_board1_1'));
+  cases_board1.push(new case_card(610, 10, 'case_board1_2'));
+  cases_board1.push(new case_card(720, 10, 'case_board1_3'));
+  cases_board2= [];
+  cases_board2.push(new case_card(390, 171, 'case_board2_0'));
+  cases_board2.push(new case_card(500, 171, 'case_board2_1'));
+  cases_board2.push(new case_card(610, 171, 'case_board2_2'));
+  cases_board2.push(new case_card(720, 171, 'case_board2_3'));
+
   create_card();
   create_login();
   create_chat();
@@ -95,12 +114,41 @@ function create_card() {
   cards.push(new card_model('colonel', 'Prepare...', 5, 3, 3, cardimages[4]));
   cards.push(new card_model('marshal', 'Think...', 6, 3, 4, cardimages[5]));
   cards.push(new card_model('general', 'Serve...', 7, 4, 3, cardimages[6]));
-  cards.push(new card_model('player', '', 0, 20, 1, cardimages[7]));
-  cards.push(new card_model('player', '', 0, 20, 1, cardimages[8]));
+  cards.push(new card_model('player', '', 0, 1, 20, cardimages[7]));
+  cards.push(new card_model('player', '', 0, 1, 20, cardimages[8]));
 }
 function card_model(title_card, text_card, cost, atk, def, image_card) {
   this.title_card= title_card; this.text_card= text_card; this.cost= cost;
   this.atk= atk; this.def= def; this.image_card= image_card;
+}
+//-----------------------------------------------------------
+function case_card(left, top, id) {
+  var canvas = document.createElement('canvas');
+  canvas.id= id;
+  canvas.width  = 100;  canvas.height = 150;
+  canvas.style.position = "absolute";
+  canvas.style.left = left;
+  canvas.style.top = top;
+  canvas.style.border = "1px solid grey";
+  document.body.appendChild(canvas);
+  this.canvas= document.getElementById(id);
+  this.draw = function() {
+    this.canvas.style.border = "1px solid red";
+    var ctx = this.canvas.getContext("2d");
+    //console.log('tt '+ card_num +' : '+ typeof(cards[card_num].image_card) + ' - ' + typeof(cardimages[card_num]));
+    ctx.drawImage(cards[this.card].image_card, 1, 1);
+    ctx.stroke();
+
+    ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text(cards[this.card].cost, 3, 9, ctx)
+    my_draw_text(cards[this.card].title_card, 22, 10, ctx)
+
+    ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text(cards[this.card].atk, 90, 147, ctx)
+    ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text(cards[this.card].def, 3, 147, ctx)
+    my_draw_text(cards[this.card].text_card, 5, 100, ctx)
+  }
 }
 //-----------------------------------------------------------
 function my_draw_text(text, x, y, context) {
@@ -118,7 +166,7 @@ function draw_card(x, y, card_num) {
   canvas.style.position = "absolute";
   canvas.style.left = x;
   canvas.style.top = y;
-  canvas.style.border = "1px solid grey";
+  canvas.style.border = "1px solid red";
   var ctx = canvas.getContext("2d");
   //console.log('tt '+ card_num +' : '+ typeof(cards[card_num].image_card) + ' - ' + typeof(cardimages[card_num]));
   ctx.drawImage(cards[card_num].image_card, 1, 1);
