@@ -130,6 +130,9 @@ function case_card(left, top, id) {
   canvas.style.left = left;
   canvas.style.top = top;
   canvas.style.border = "1px solid grey";
+  canvas.onclick = function() {
+    console.log('canvas click id '+id);
+  }
   document.body.appendChild(canvas);
   this.canvas= document.getElementById(id);
 

@@ -1,6 +1,57 @@
 --------------------------------------------
 GOMASS :
 --------------------------------------------
+game.players[socket.id].board[num].card
+--------------------------------------------
+// src and dst are canvas id
+client emit 'move' src,dst
+serveur on 'move':
+  if player_turn!=socket.id return;
+
+  if ( typeof( game.players[socket.id].board[src].card ) == 'undefined' ) return;
+  card_src= game.players[socket.id].board[src].card
+  if ( typeof( game.players[socket.id].board[dst].card ) == 'undefined' ) return;
+  card_dst= game.players[socket.id].board[dst].card
+
+  if src in 1..4(hand) and dst in 10..12(my_field)
+    emit sender 'move_ok'
+    emit other add card n°src n°field (= src - 3)
+  if src in 10..12(my_field) and dst in 7..9(other_field)
+    emit sender remove card n°dst
+    emit other remove card n°dst (= dst + 3)
+--------------------------------------------
+
+--------------------------------------------
+//game.players[socket.id].hand  game.players[socket.id].field
+
+client emit 'move' src,dst
+serveur : on 'move'
+  if player_turn!=socket.id return;
+  if src not exist return;
+  if src in hand and dst in my_field
+    emit sender move ok
+    emit other add card n°src n°field
+  if src in my_field and dst in other_field
+    emit sender remove card n°dst
+    emit other remove card n°dst
+--------------------------------------------
+client board:
+1 2  5   7  8  9
+3 4  6  10 11 12
+server board
+1 2  5 6    9   11 12 13
+3 4  7 8   10   14 15 16
+--------------------------------------------
+click client emit src,dest
+ if src in hand and dest in board -> summon
+   emit client sender : move card src dest, --mana
+   //emit client sender : remove card src hand, --mana, add card board
+   emit other player : add card board n°case, --mana other
+--------------------------------------------
+hand click + board click -> emit summon src,dest ->
+board click + player click -> emit attack_player src
+board click + board click -> emit attack_board src,dest
+--------------------------------------------
 liste of minion card (7), liste of player card (2)
 
 second join game => start game :
@@ -10,8 +61,6 @@ second join game => start game :
 sendhand() {send_card }
  .. display_hand()
 first-player
-
-
 --------------------------------------------
 --------------------------------------------
 summon card (hand_src, board_dst)

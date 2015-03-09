@@ -113,6 +113,11 @@ io.on('connection', function(socket){
       login: data.login,
       message: data.message
     });
+    // test multi-emit ok
+    /*socket.emit('sendroom', {
+      login: 'test',
+      message: ' test msg'
+    });*/
   });
 //-----------------------------------------------------------
 });
