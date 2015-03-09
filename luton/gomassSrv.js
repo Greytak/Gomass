@@ -1,3 +1,6 @@
+// Include common code with client
+var fs = require('fs');
+eval(fs.readFileSync('common.js')+'');
 // Setup basic express server
 var express = require('express');
 var app = express();

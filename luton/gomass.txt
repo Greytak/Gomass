@@ -4,10 +4,18 @@ GOMASS :
 game.players[socket.id].board[num].card
 --------------------------------------------
 // src and dst are canvas id
-client emit 'move' src,dst
-serveur on 'move':
-  if player_turn!=socket.id return;
 
+client emit 'move' (src,dst)
+
+serveur on 'move':
+
+  // if not your turn exit
+  if (player_turn!=socket.id) return;
+
+  // id of other player
+  if (player_turn==player1) other_id= player2; else other_id= player1;
+
+  // if src or dst card not exist exit
   if ( typeof( game.players[socket.id].board[src].card ) == 'undefined' ) return;
   card_src= game.players[socket.id].board[src].card
   if ( typeof( game.players[socket.id].board[dst].card ) == 'undefined' ) return;
@@ -15,10 +23,20 @@ serveur on 'move':
 
   if src in 1..4(hand) and dst in 10..12(my_field)
     emit sender 'move_ok'
-    emit other add card n°src n°field (= src - 3)
+    emit other 'add_card' (card:n°src, dst:n°field (= src - 3))
+    return;
+
   if src in 10..12(my_field) and dst in 7..9(other_field)
-    emit sender remove card n°dst
-    emit other remove card n°dst (= dst + 3)
+    card_dst.def -= card_src.atk
+    card_src.def -= card_dst.atk
+    if ( card_dst.def<=0 ) // idem with card_src
+      emit sender 'remove_card' (card:n°dst)
+      emit other 'remove_card' (card:n°dst (= dst + 3))
+    else
+      emit sender 'modify_card' (card:n°dst, def:card_dst.def)
+      emit other 'modify_card' (card:n°dst (= dst + 3), def:card_dst.def)
+    return;
+    
 --------------------------------------------
 
 --------------------------------------------

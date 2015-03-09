@@ -5,6 +5,7 @@
 </head>
 <body></body>
 <script src="/socket.io/socket.io.js"></script>
+<script src="common.js"></script>
 <script>
 //-----------------------------------------------------------
 // ensure all images are loaded then start the game
@@ -105,23 +106,6 @@ function after_images_loaded() {
   create_buttons_party();
 }
 //-----------------------------------------------------------
-function create_card() {
-  cards=[];
-  cards.push(new card_model('soldier', 'Ready...', 1, 1, 1, cardimages[0]));
-  cards.push(new card_model('sergeant', 'Yes...', 2, 1, 2, cardimages[1]));
-  cards.push(new card_model('lieutenant', 'Ok...', 3, 2, 2, cardimages[2]));
-  cards.push(new card_model('captain', 'Go...', 4, 2, 3, cardimages[3]));
-  cards.push(new card_model('colonel', 'Prepare...', 5, 3, 3, cardimages[4]));
-  cards.push(new card_model('marshal', 'Think...', 6, 3, 4, cardimages[5]));
-  cards.push(new card_model('general', 'Serve...', 7, 4, 3, cardimages[6]));
-  cards.push(new card_model('player', '', 0, 1, 20, cardimages[7]));
-  cards.push(new card_model('player', '', 0, 1, 20, cardimages[8]));
-}
-function card_model(title_card, text_card, cost, atk, def, image_card) {
-  this.title_card= title_card; this.text_card= text_card; this.cost= cost;
-  this.atk= atk; this.def= def; this.image_card= image_card;
-}
-//-----------------------------------------------------------
 function case_card(left, top, id) {
   var canvas = document.createElement('canvas');
   canvas.id= id;
@@ -140,7 +124,7 @@ function case_card(left, top, id) {
     this.canvas.style.border = "1px solid red";
     var ctx = this.canvas.getContext("2d");
     //console.log('tt '+ card_num +' : '+ typeof(cards[card_num].image_card) + ' - ' + typeof(cardimages[card_num]));
-    ctx.drawImage(cards[this.card].image_card, 1, 1);
+    ctx.drawImage(cardimages[cards[this.card].image_num], 1, 1);
     ctx.stroke();
 
     ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
