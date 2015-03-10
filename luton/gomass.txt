@@ -7,7 +7,7 @@ game.players[socket.id].board[num].card
 
 client emit 'move' (src,dst)
 
-serveur on 'move':
+socket.on('move', function (data) {
 
   // if not your turn exit
   if (player_turn!=socket.id) return;
@@ -36,7 +36,7 @@ serveur on 'move':
       emit sender 'modify_card' (card:n°dst, def:card_dst.def)
       emit other 'modify_card' (card:n°dst (= dst + 3), def:card_dst.def)
     return;
-    
+
 --------------------------------------------
 
 --------------------------------------------

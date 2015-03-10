@@ -1,4 +1,5 @@
 //-----------------------------------------------------------
+// http://stackoverflow.com/questions/5797852/in-node-js-how-do-i-include-functions-from-my-other-files
 function create_card() {
   cards=[];
   cards.push(new card_model('soldier', 'Ready...', 1, 1, 1, 0));

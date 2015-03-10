@@ -116,6 +116,16 @@ io.on('connection', function(socket){
       login: data.login,
       message: data.message
     });
+    socket.emit('sendall', {
+      login: 'sys',
+      message: 'msg before return'
+    });
+    // test return ok
+    /*return;
+    socket.emit('sendall', {
+      login: 'sys',
+      message: 'msg after return'
+    });*/
     // test multi-emit ok
     /*socket.emit('sendroom', {
       login: 'test',
