@@ -38,18 +38,17 @@ socket.on('createparty', function(data) {
   document.getElementById("listparties").appendChild(option);
 })
 //-----------------------------------------------------------
+//  client board:
+//  0 1  4   10 11 12 13
+//  2 3  5    6  7  8  9
 // init game display player cards
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
-  // display players's cards
-  cards[data.my_card].title_card= 'My';
-  cards[data.other_card].title_card= 'Other';
-  cases_player[0].card= data.my_card;
-  cases_player[0].draw();
-  cases_player[1].card= data.other_card;
-  cases_player[1].draw();
+  for (var i=0; i<13; i++) board[i].card= data.board[i];
+  board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
+  board[5].draw();  board[4].draw();
   // modify turnswap button
-  if (data.myturn) {
+  if (data.player_turn==socket.id) {
     document.getElementById('turnswap').value= 'end turn';
     document.getElementById('turnswap').disabled= false;
   } else {
@@ -57,12 +56,7 @@ socket.on('joinparty', function(data) {
     document.getElementById('turnswap').disabled= true;
   }
   // display hand
-  var i= 0;
-  for (card of data.hand) {
-    cases_hand[i].card= card;
-    cases_hand[i].draw();
-    i++;
-  }
+  for (var i=0; i<4; i++) if (board[i].card) board[i].draw();
 })
 //-----------------------------------------------------------
 function preloadimages() {
@@ -79,24 +73,27 @@ function preloadimages() {
 }
 //-----------------------------------------------------------
 function after_images_loaded() {
-  cases_hand= [];
-  cases_hand.push(new case_card(20, 10, 'case_hand_0'));
-  cases_hand.push(new case_card(130, 10, 'case_hand_1'));
-  cases_hand.push(new case_card(20, 171, 'case_hand_2'));
-  cases_hand.push(new case_card(130, 171, 'case_hand_3'));
-  cases_player= [];
-  cases_player.push(new case_card(260, 10, 'case_player_0'));
-  cases_player.push(new case_card(260, 171, 'case_player_1'));
-  cases_board1= [];
-  cases_board1.push(new case_card(390, 10, 'case_board1_0'));
-  cases_board1.push(new case_card(500, 10, 'case_board1_1'));
-  cases_board1.push(new case_card(610, 10, 'case_board1_2'));
-  cases_board1.push(new case_card(720, 10, 'case_board1_3'));
-  cases_board2= [];
-  cases_board2.push(new case_card(390, 171, 'case_board2_0'));
-  cases_board2.push(new case_card(500, 171, 'case_board2_1'));
-  cases_board2.push(new case_card(610, 171, 'case_board2_2'));
-  cases_board2.push(new case_card(720, 171, 'case_board2_3'));
+  //  client board:
+  //  0 1  4   10 11 12 13
+  //  2 3  5    6  7  8  9
+  board= [];
+  board[0]= new case_card(20, 10, 'case_hand_0');
+  board[1]= new case_card(130, 10, 'case_hand_1');
+  board[2]= new case_card(20, 171, 'case_hand_2');
+  board[3]= new case_card(130, 171, 'case_hand_3');
+
+  board[4]= new case_card(260, 10, 'case_player_4');
+  board[5]= new case_card(260, 171, 'case_player_5');
+
+  board[6]= new case_card(390, 171, 'case_board_6');
+  board[7]= new case_card(500, 171, 'case_board_7');
+  board[8]= new case_card(610, 171, 'case_board_8');
+  board[9]= new case_card(720, 171, 'case_board_9');
+
+  board[10]= new case_card(390, 10, 'case_board_10');
+  board[11]= new case_card(500, 10, 'case_board_11');
+  board[12]= new case_card(610, 10, 'case_board_12');
+  board[13]= new case_card(720, 10, 'case_board_13');
 
   create_card();
   create_login();
@@ -123,19 +120,19 @@ function case_card(left, top, id) {
   this.draw = function() {
     this.canvas.style.border = "1px solid red";
     var ctx = this.canvas.getContext("2d");
-    //console.log('tt '+ card_num +' : '+ typeof(cards[card_num].image_card) + ' - ' + typeof(cardimages[card_num]));
-    ctx.drawImage(cardimages[cards[this.card].image_num], 1, 1);
+    console.log('tt '+ this.card.image_num +' dd '+ cardimages[this.card.image_num]);
+    ctx.drawImage(cardimages[this.card.image_num], 1, 1);
     ctx.stroke();
 
     ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(cards[this.card].cost, 3, 9, ctx)
-    my_draw_text(cards[this.card].title_card, 22, 10, ctx)
+    my_draw_text(this.card.cost, 3, 9, ctx)
+    my_draw_text(this.card.title_card, 22, 10, ctx)
 
     ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(cards[this.card].atk, 90, 147, ctx)
+    my_draw_text(this.card.atk, 90, 147, ctx)
     ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(cards[this.card].def, 3, 147, ctx)
-    my_draw_text(cards[this.card].text_card, 5, 100, ctx)
+    my_draw_text(this.card.def, 3, 147, ctx);
+    my_draw_text(this.card.text_card, 5, 100, ctx);
   }
 }
 //-----------------------------------------------------------

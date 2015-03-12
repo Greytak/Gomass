@@ -2,6 +2,7 @@
 GOMASS :
 --------------------------------------------
 game.players[socket.id].board[num].card
+OR ? game.players[idx].board[num].card
 --------------------------------------------
 // src and dst are canvas id
 
@@ -54,11 +55,17 @@ serveur : on 'move'
     emit other remove card n°dst
 --------------------------------------------
 client board:
-1 2  5   7  8  9
-3 4  6  10 11 12
+1 2  9  10 11 12
+3 4  5   6  7  8
 server board
 1 2  5 6    9   11 12 13
 3 4  7 8   10   14 15 16
+OR x2
+1 2
+3 4  5   6  7  8
+OR x2
+1 2  9  10 11 12
+3 4  5   6  7  8
 --------------------------------------------
 click client emit src,dest
  if src in hand and dest in board -> summon
