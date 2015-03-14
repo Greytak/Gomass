@@ -13,30 +13,19 @@ preloadimages();
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
-var canvas_source = "";
-var canvas_destination = "";
+var src_num = '';
 //-----------------------------------------------------------
-// display sender login and chat message to all or to the room
-socket.on('sendall', function(data) {
-  console.log('sendall');
-  document.getElementById('generalchat').value += data.login + ' : ' + data.message + '\n';
-  document.getElementById('messagechat').value = '';
-})
-socket.on('sendroom', function(data) {
-  console.log('sendroom');
-  document.getElementById('roomchat').value += data.login + ' : ' + data.message + '\n';
-  document.getElementById('messagechat').value = '';
-})
+socket.on('addcard', function(data) {
+  console.log('addcard '+data.card+ ' data.num_card '+data.num_card);
+  board[data.num_card].card= data.card;
+  board[data.num_card].draw();
+});
 //-----------------------------------------------------------
-// add party_name to select 'listparties' and select it if you are the creator
-socket.on('createparty', function(data) {
-  console.log('createparty '+data.party_name);
-  var option = document.createElement("option");
-  option.value = data.party_name;
-  option.innerHTML = data.party_name;
-  if (data.login==document.getElementById('login').value) option.selected = true;
-  document.getElementById("listparties").appendChild(option);
-})
+socket.on('rmcard', function(data) {
+  console.log('rmcard '+data.num_card);
+  board[data.num_card].card= null;
+  board[data.num_card].clear_card();
+});
 //-----------------------------------------------------------
 //  client board:
 //  0 1  4   10 11 12 13
@@ -44,7 +33,10 @@ socket.on('createparty', function(data) {
 // init game display player cards
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
+  party_name= data.party_name;
+  // copy all cards
   for (var i=0; i<13; i++) board[i].card= data.board[i];
+  // modify and draw players's card
   board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
   board[5].draw();  board[4].draw();
   // modify turnswap button
@@ -57,7 +49,29 @@ socket.on('joinparty', function(data) {
   }
   // display hand
   for (var i=0; i<4; i++) if (board[i].card) board[i].draw();
-})
+});
+//-----------------------------------------------------------
+// add party_name to select 'listparties' and select it if you are the creator
+socket.on('createparty', function(data) {
+  console.log('createparty '+data.party_name);
+  var option = document.createElement("option");
+  option.value = data.party_name;
+  option.innerHTML = data.party_name;
+  if (data.login==document.getElementById('login').value) option.selected = true;
+  document.getElementById("listparties").appendChild(option);
+});
+//-----------------------------------------------------------
+// display sender login and chat message to all or to the room
+socket.on('sendall', function(data) {
+  console.log('sendall');
+  document.getElementById('generalchat').value += data.login + ' : ' + data.message + '\n';
+  document.getElementById('messagechat').value = '';
+});
+socket.on('sendroom', function(data) {
+  console.log('sendroom');
+  document.getElementById('roomchat').value += data.login + ' : ' + data.message + '\n';
+  document.getElementById('messagechat').value = '';
+});
 //-----------------------------------------------------------
 function preloadimages() {
   cardimages=[];
@@ -77,23 +91,23 @@ function after_images_loaded() {
   //  0 1  4   10 11 12 13
   //  2 3  5    6  7  8  9
   board= [];
-  board[0]= new case_card(20, 10, 'case_hand_0');
-  board[1]= new case_card(130, 10, 'case_hand_1');
-  board[2]= new case_card(20, 171, 'case_hand_2');
-  board[3]= new case_card(130, 171, 'case_hand_3');
+  board[0]= new case_card(20, 10, 'case_hand_0', 0);
+  board[1]= new case_card(130, 10, 'case_hand_1', 1);
+  board[2]= new case_card(20, 171, 'case_hand_2', 2);
+  board[3]= new case_card(130, 171, 'case_hand_3', 3);
 
-  board[4]= new case_card(260, 10, 'case_player_4');
-  board[5]= new case_card(260, 171, 'case_player_5');
+  board[4]= new case_card(260, 10, 'case_player_4', 4);
+  board[5]= new case_card(260, 171, 'case_player_5', 5);
 
-  board[6]= new case_card(390, 171, 'case_board_6');
-  board[7]= new case_card(500, 171, 'case_board_7');
-  board[8]= new case_card(610, 171, 'case_board_8');
-  board[9]= new case_card(720, 171, 'case_board_9');
+  board[6]= new case_card(390, 171, 'case_board_6', 6);
+  board[7]= new case_card(500, 171, 'case_board_7', 7);
+  board[8]= new case_card(610, 171, 'case_board_8', 8);
+  board[9]= new case_card(720, 171, 'case_board_9', 9);
 
-  board[10]= new case_card(390, 10, 'case_board_10');
-  board[11]= new case_card(500, 10, 'case_board_11');
-  board[12]= new case_card(610, 10, 'case_board_12');
-  board[13]= new case_card(720, 10, 'case_board_13');
+  board[10]= new case_card(390, 10, 'case_board_10', 10);
+  board[11]= new case_card(500, 10, 'case_board_11', 11);
+  board[12]= new case_card(610, 10, 'case_board_12', 12);
+  board[13]= new case_card(720, 10, 'case_board_13', 13);
 
   create_card();
   create_login();
@@ -103,24 +117,43 @@ function after_images_loaded() {
   create_buttons_party();
 }
 //-----------------------------------------------------------
-function case_card(left, top, id) {
+function case_card(left, top, id, numid) {
+  this.numid= numid;
   var canvas = document.createElement('canvas');
   canvas.id= id;
+  canvas.case_card= this;
   canvas.width  = 100;  canvas.height = 150;
   canvas.style.position = "absolute";
   canvas.style.left = left;
   canvas.style.top = top;
   canvas.style.border = "1px solid grey";
   canvas.onclick = function() {
-    console.log('canvas click id '+id);
+    console.log('canvas click this.id= '+this.id+' src_num= '+src_num);
+    this.case_card.case_click();
   }
   document.body.appendChild(canvas);
   this.canvas= document.getElementById(id);
 
+  this.case_click = function() {
+    console.log('case_click src_num= '+src_num+ ' this.numid= '+this.numid+ ' party_name= '+party_name);
+    // remember canvas clicked in src_num
+    if (src_num == '') { src_num= this.numid; return; }
+    // if same canvas empty src_num
+    if (src_num == this.numid) { src_num= ''; return; }
+    // send move message
+    if (party_name!='') {
+      socket.emit('move_card', {
+        party_name : party_name,
+        src_num : src_num,
+        dst_num : this.numid
+      });
+      src_num= '';
+    }
+  };
   this.draw = function() {
     this.canvas.style.border = "1px solid red";
     var ctx = this.canvas.getContext("2d");
-    console.log('tt '+ this.card.image_num +' dd '+ cardimages[this.card.image_num]);
+    //console.log('tt '+ this.card.image_num +' dd '+ cardimages[this.card.image_num]);
     ctx.drawImage(cardimages[this.card.image_num], 1, 1);
     ctx.stroke();
 
@@ -133,7 +166,14 @@ function case_card(left, top, id) {
     ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
     my_draw_text(this.card.def, 3, 147, ctx);
     my_draw_text(this.card.text_card, 5, 100, ctx);
-  }
+  };
+  this.clear_card = function() {
+    var ctx = this.canvas.getContext("2d");
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    //nok? ctx.clearRect(0, 0, this.width, this.height);
+    this.canvas.style.border = "1px solid grey";
+    //ctx.stroke();
+  };
 }
 //-----------------------------------------------------------
 function my_draw_text(text, x, y, context) {
@@ -201,7 +241,7 @@ function create_chat() {
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
     });
-  }
+  };
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
@@ -216,7 +256,7 @@ function create_chat() {
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
     });
-  }
+  };
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------
@@ -247,7 +287,7 @@ function create_buttons() {
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
     });
-  }
+  };
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
@@ -262,7 +302,7 @@ function create_buttons() {
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
     });
-  }
+  };
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------
@@ -282,7 +322,7 @@ function create_buttons_party() {
       party_name: document.getElementById('party_name').value,
       login: document.getElementById('login').value
     });
-  }
+  };
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.id = 'party_name';
@@ -305,7 +345,7 @@ function create_buttons_party() {
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
     });
-  }
+  };
   document.body.appendChild(element);
   var element = document.createElement("input");
   element.type = "button";
@@ -323,7 +363,7 @@ function create_buttons_party() {
         party_name: party_name,
         login: document.getElementById('login').value
       });
-  }
+  };
   document.body.appendChild(element);
 }
 //-----------------------------------------------------------

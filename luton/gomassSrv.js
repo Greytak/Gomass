@@ -58,6 +58,51 @@ function Game() {
 io.on('connection', function(socket){
   console.log('io.on connection');
   //-----------------------------------------------------------
+  socket.on('move_card', function (data) {
+    /*party_name : party_name,
+    src_num : src_num,
+    dst_num : this.numid*/
+    console.log('socket.on move_card '+data.party_name+ ' id '+ socket.id);
+    var thegame= games[data.party_name];
+    // if not your turn exit
+    if (thegame.player_turn!=socket.id) return;
+    // id of players
+    if (thegame.player_turn==thegame.player_create) {
+      var my_player= thegame.player_create;
+      var other_player= thegame.player_join;
+    }
+    else {
+      var my_player= thegame.player_join;
+      var other_player= thegame.player_create;
+    }
+    // if source card not exist exit
+    if (! my_player.board[data.src_num]) return;
+    // if src in my hand and dst in my field summon
+    if (data.src_num>=0 && data.src_num<=3)
+    if (data.dst_num>=6 && data.dst_num<=9)
+    if (! my_player.board[data.dst_num])
+    {
+      my_player.board[data.dst_num]= my_player.board[data.src_num];
+      other_player.board[data.dst_num + 4]= my_player.board[data.src_num];
+      my_player.board[data.src_num]= null;
+    }
+    // send a message to the room socket.game exept the sender
+    socket.broadcast.to(data.party_name).emit('addcard', {
+      num_card: data.dst_num + 4,
+      card: my_player.board[data.dst_num]
+    });
+    // send message only to the sender
+    socket.emit('addcard', {
+      num_card: data.dst_num,
+      card: my_player.board[data.dst_num]
+    });
+    socket.emit('rmcard', {
+      num_card: data.src_num
+    });
+  });
+  //  client board:
+  //  0 1  4   10 11 12 13
+  //  2 3  5    6  7  8  9
   //-----------------------------------------------------------
   socket.on('joinparty', function (data) {
     console.log('socket.on joinparty '+data.party_name+ ' id '+ socket.id);
@@ -66,7 +111,6 @@ io.on('connection', function(socket){
     socket.join(data.party_name);
     thegame.init();
     // send a message to the room socket.game exept the sender
-    //socket.broadcast.to(socket.game).emit('joinparty', {
     socket.broadcast.to(data.party_name).emit('joinparty', {
       login: data.login,
       party_name: data.party_name,
