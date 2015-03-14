@@ -13,7 +13,7 @@ preloadimages();
 //-----------------------------------------------------------
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
-var src_num = '';
+var src_num = -1;
 //-----------------------------------------------------------
 socket.on('addcard', function(data) {
   console.log('addcard '+data.card+ ' data.num_card '+data.num_card);
@@ -135,11 +135,15 @@ function case_card(left, top, id, numid) {
   this.canvas= document.getElementById(id);
 
   this.case_click = function() {
-    console.log('case_click src_num= '+src_num+ ' this.numid= '+this.numid+ ' party_name= '+party_name);
+    console.log('case_click src_num= '+src_num+ ' typeof srcnum '+ typeof(src_num) +' this.numid= '+this.numid+ ' party_name= '+party_name);
     // remember canvas clicked in src_num
-    if (src_num == '') { src_num= this.numid; return; }
+    if (src_num == -1) {
+      src_num= this.numid;
+      console.log('src_num= '+src_num+' title '+ board[src_num].card.title_card);
+      return;
+    }
     // if same canvas empty src_num
-    if (src_num == this.numid) { src_num= ''; return; }
+    if (src_num == this.numid) { src_num= -1; return; }
     // send move message
     if (party_name!='') {
       socket.emit('move_card', {
@@ -147,7 +151,7 @@ function case_card(left, top, id, numid) {
         src_num : src_num,
         dst_num : this.numid
       });
-      src_num= '';
+      src_num= -1; // empty src_num
     }
   };
   this.draw = function() {
