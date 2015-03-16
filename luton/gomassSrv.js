@@ -86,9 +86,6 @@ io.on('connection', function(socket){
     });
     //-----------------------------------------------------------
     socket.on('move_card', function (data) {
-    /*party_name : party_name,
-    src_num : src_num,
-    dst_num : this.numid*/
     console.log('socket.on move_card '+data.party_name+ ' id '+ socket.id);
     var thegame= games[data.party_name];
     // if not your turn exit
@@ -97,7 +94,7 @@ io.on('connection', function(socket){
     // if source card not exist exit
     if (! players.my.board[data.src_num]) return;
     // log
-    console.log('receive move : src_num= '+data.src_num+' title '+ players.my.board[data.src_num].title_card);
+    //console.log('receive move : src_num= '+data.src_num+' title '+ players.my.board[data.src_num].title_card);
     // if src in my hand and dst in my field summon
     if (data.src_num>=0 && data.src_num<=3)
     if (data.dst_num>=6 && data.dst_num<=9)

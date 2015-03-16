@@ -55,14 +55,6 @@ socket.on('joinparty', function(data) {
   board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
   board[5].draw();  board[4].draw();
   set_turnswap(data.player_turn);
-  // modify turnswap button
-  /*if (data.player_turn==socket.id) {
-    document.getElementById('turnswap').value= 'end turn';
-    document.getElementById('turnswap').disabled= false;
-  } else {
-    document.getElementById('turnswap').value= 'other turn';
-    document.getElementById('turnswap').disabled= true;
-  }*/
   // display hand
   for (var i=0; i<4; i++) if (board[i].card) board[i].draw();
 });
