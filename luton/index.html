@@ -15,18 +15,19 @@ var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
 var src_num = -1;
 //-----------------------------------------------------------
-socket.on('turnswap', function(data) {
-  /*console.log('addcard '+data.card+ ' data.num_card '+data.num_card);
-  board[data.num_card].card= data.card;
-  board[data.num_card].draw();*/
+function set_turnswap(player_turn) {
   // modify turnswap button
-  if (data.player_turn==socket.id) {
+  if (player_turn==socket.id) {
     document.getElementById('turnswap').value= 'end turn';
     document.getElementById('turnswap').disabled= false;
   } else {
     document.getElementById('turnswap').value= 'other turn';
     document.getElementById('turnswap').disabled= true;
   }
+}
+//-----------------------------------------------------------
+socket.on('turnswap', function(data) {
+  set_turnswap(data.player_turn);
 });
 //-----------------------------------------------------------
 socket.on('addcard', function(data) {
@@ -53,14 +54,15 @@ socket.on('joinparty', function(data) {
   // modify and draw players's card
   board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
   board[5].draw();  board[4].draw();
+  set_turnswap(data.player_turn);
   // modify turnswap button
-  if (data.player_turn==socket.id) {
+  /*if (data.player_turn==socket.id) {
     document.getElementById('turnswap').value= 'end turn';
     document.getElementById('turnswap').disabled= false;
   } else {
     document.getElementById('turnswap').value= 'other turn';
     document.getElementById('turnswap').disabled= true;
-  }
+  }*/
   // display hand
   for (var i=0; i<4; i++) if (board[i].card) board[i].draw();
 });
