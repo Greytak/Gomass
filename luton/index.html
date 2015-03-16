@@ -15,6 +15,20 @@ var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
 var src_num = -1;
 //-----------------------------------------------------------
+socket.on('turnswap', function(data) {
+  /*console.log('addcard '+data.card+ ' data.num_card '+data.num_card);
+  board[data.num_card].card= data.card;
+  board[data.num_card].draw();*/
+  // modify turnswap button
+  if (data.player_turn==socket.id) {
+    document.getElementById('turnswap').value= 'end turn';
+    document.getElementById('turnswap').disabled= false;
+  } else {
+    document.getElementById('turnswap').value= 'other turn';
+    document.getElementById('turnswap').disabled= true;
+  }
+});
+//-----------------------------------------------------------
 socket.on('addcard', function(data) {
   console.log('addcard '+data.card+ ' data.num_card '+data.num_card);
   board[data.num_card].card= data.card;
@@ -292,8 +306,7 @@ function create_buttons() {
   element.style.top = 334;
   element.onclick = function() {
     socket.emit('turnswap', {
-        message: document.getElementById('messagechat').value,
-        login: document.getElementById('login').value
+        party_name : party_name
     });
   };
   document.body.appendChild(element);
