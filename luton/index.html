@@ -119,6 +119,7 @@ function after_images_loaded() {
 //-----------------------------------------------------------
 function case_card(left, top, id, numid) {
   this.numid= numid;
+  this.card= null;
   var canvas = document.createElement('canvas');
   canvas.id= id;
   canvas.case_card= this;
@@ -144,8 +145,11 @@ function case_card(left, top, id, numid) {
     }
     // if same canvas empty src_num
     if (src_num == this.numid) { src_num= -1; return; }
+    // if dst not empty return
+    if (this.card) return;
     // send move message
     if (party_name!='') {
+      console.log('send move : src_num= '+src_num+' title '+ board[src_num].card.title_card);
       socket.emit('move_card', {
         party_name : party_name,
         src_num : src_num,

@@ -50,7 +50,7 @@ function Game() {
       player1.deck.push(Math.round(Math.random() * 6))
       player2.deck.push(Math.round(Math.random() * 6))
     }
-    console.log('Party init player1.board[1]= '+player1.board[1]);
+    console.log('Party init player1.board[1]= '+player1.board[1].title_card);
   };
 }
 //-----------------------------------------------------------
@@ -67,7 +67,7 @@ io.on('connection', function(socket){
     // if not your turn exit
     if (thegame.player_turn!=socket.id) return;
     // id of players
-    if (thegame.player_turn==thegame.player_create) {
+    if (thegame.player_turn==thegame.player_create.socket_id) {
       var my_player= thegame.player_create;
       var other_player= thegame.player_join;
     }
@@ -77,6 +77,8 @@ io.on('connection', function(socket){
     }
     // if source card not exist exit
     if (! my_player.board[data.src_num]) return;
+    // log
+    console.log('receive move : src_num= '+data.src_num+' title '+ my_player.board[data.src_num].title_card);
     // if src in my hand and dst in my field summon
     if (data.src_num>=0 && data.src_num<=3)
     if (data.dst_num>=6 && data.dst_num<=9)
@@ -110,6 +112,7 @@ io.on('connection', function(socket){
     thegame.player_join= new Player(socket.id);
     socket.join(data.party_name);
     thegame.init();
+    //current console.log('check board[1] player1.board[1]= '+player1.board[1].title_card);
     // send a message to the room socket.game exept the sender
     socket.broadcast.to(data.party_name).emit('joinparty', {
       login: data.login,
@@ -180,6 +183,7 @@ io.on('connection', function(socket){
 
 
 //-----------------------------------------------------------
+// common.js test eval at the end ??
 //-----------------------------------------------------------
 function create_card() {
   card_models=[];
