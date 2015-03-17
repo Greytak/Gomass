@@ -26,6 +26,14 @@ function set_turnswap(player_turn) {
   }
 }
 //-----------------------------------------------------------
+socket.on('chcard', function(data) {
+  console.log('chcard '+data.card+ ' data.num_card '+data.num_card);
+  //set_turnswap(data.player_turn);
+  //{ num_card: data.dst_num, card: players.my.board[data.dst_num] });
+  board[data.num_card].card= data.card;
+  board[data.num_card].draw();
+});
+//-----------------------------------------------------------
 socket.on('turnswap', function(data) {
   set_turnswap(data.player_turn);
 });
@@ -154,10 +162,10 @@ function case_card(left, top, id, numid) {
     // if same canvas empty src_num
     if (src_num == this.numid) { src_num= -1; return; }
     // if dst not empty return
-    if (this.card) return;
+    // if (this.card) return;
     // send move message
     if (party_name!='') {
-      console.log('send move : src_num= '+src_num+' title '+ board[src_num].card.title_card);
+      console.log('send move : src_num= '+src_num+'dst_num '+this.numid+' title '+ board[src_num].card.title_card);
       socket.emit('move_card', {
         party_name : party_name,
         src_num : src_num,

@@ -45,6 +45,7 @@ function Game() {
       player1.board[i]= new Card(Math.round(Math.random() * 6));
     for (var i = 0; i < 3; i++)
       player2.board[i]= new Card(Math.round(Math.random() * 6));
+    // other board null ??
     // random from 1 to 7 integer deck
     for (var i = 1, l = 90; i < l; i++) {
       player1.deck.push(Math.round(Math.random() * 6))
@@ -88,36 +89,72 @@ io.on('connection', function(socket){
     socket.on('move_card', function (data) {
     console.log('socket.on move_card '+data.party_name+ ' id '+ socket.id);
     var thegame= games[data.party_name];
-    // if not your turn exit
+    // if it is not your turn : exit
     if (thegame.player_turn!=socket.id) return;
     var players= determine_players(thegame);
-    // if source card not exist exit
+    // if source card does not exist : exit
     if (! players.my.board[data.src_num]) return;
-    // log
-    //console.log('receive move : src_num= '+data.src_num+' title '+ players.my.board[data.src_num].title_card);
-    // if src in my hand and dst in my field summon
+    console.log('receive move : data.src_num= '+data.src_num+' data.dst_num '+data.dst_num+' title '+ players.my.board[data.src_num].title_card);
+    // if src in my hand and dst in my field : summon
     if (data.src_num>=0 && data.src_num<=3)
     if (data.dst_num>=6 && data.dst_num<=9)
-    if (! players.my.board[data.dst_num])
-    {
+    if (! players.my.board[data.dst_num]) { // if dst empty
+      console.log('summon ');
       players.my.board[data.dst_num]= players.my.board[data.src_num];
       players.other.board[data.dst_num + 4]= players.my.board[data.src_num];
       players.my.board[data.src_num]= null;
+      socket.broadcast.to(data.party_name).emit('addcard', {
+        num_card: data.dst_num + 4,
+        card: players.my.board[data.dst_num]
+      });
+      socket.emit('addcard', {
+        num_card: data.dst_num,
+        card: players.my.board[data.dst_num]
+      });
+      socket.emit('rmcard', { num_card: data.src_num });
+      return;
     }
-    // send a message to the room socket.game exept the sender
-    socket.broadcast.to(data.party_name).emit('addcard', {
-      num_card: data.dst_num + 4,
-      card: players.my.board[data.dst_num]
-    });
-    // send message only to the sender
-    socket.emit('addcard', {
-      num_card: data.dst_num,
-      card: players.my.board[data.dst_num]
-    });
-    socket.emit('rmcard', {
-      num_card: data.src_num
-    });
+    console.log(' typeof(players.my.board[data.dst_num]) '+typeof(players.my.board[data.dst_num]));
+    console.log(' players.my.board[data.dst_num] '+players.my.board[data.dst_num]);
+    // if src in my field and dst in other field : attack
+    if (data.src_num>=6 && data.src_num<=9)
+    if (data.dst_num>=10 && data.dst_num<=13)
+    if (players.my.board[data.dst_num]) { // if dst not empty
+      console.log('atk ');
+      players.my.board[data.dst_num].def -= players.my.board[data.src_num].atk;
+      players.my.board[data.src_num].def -= players.my.board[data.dst_num].atk;
+      //debugger;
+      console.log('players.my.board[data.src_num].def ' + players.my.board[data.src_num].def + ' players.other.board[data.src_num + 4].def '+ players.other.board[data.src_num + 4].def);
+      if (players.my.board[data.dst_num].def <= 0) {
+        players.my.board[data.dst_num]= null;
+        socket.emit('rmcard', { num_card: data.dst_num });
+        players.other.board[data.dst_num - 4]= null;
+        socket.broadcast.to(data.party_name).emit('rmcard', { num_card: data.dst_num - 4 });
+      } else {
+        socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
+        socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.dst_num - 4, card: players.my.board[data.dst_num] });
+      }
+      return;
+      if (players.my.board[data.src_num].def <= 0) {
+        players.my.board[data.src_num]= null;
+        socket.emit('rmcard', { num_card: data.src_num });
+        players.other.board[data.src_num + 4]= null;
+        socket.broadcast.to(data.party_name).emit('rmcard', { num_card: data.src_num + 4 });
+      } else {
+        socket.emit('chcard', { num_card: data.src_num, card: players.my.board[data.src_num] });
+        socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.src_num + 4, card: players.my.board[data.src_num] });
+      }
+      return;
+    }
   });
+  /*function Card(model_num) {
+    this.model_num= model_num;
+    this.title_card= card_models[model_num].title_card;
+    this.text_card= card_models[model_num].text_card;
+    this.atk= card_models[model_num].atk;  this.def= card_models[model_num].def;
+    this.cost= card_models[model_num].cost;
+    this.image_num= card_models[model_num].image_num;
+  }*/
   //  client board:
   //  0 1  4   10 11 12 13
   //  2 3  5    6  7  8  9
