@@ -27,7 +27,7 @@ function set_turnswap(player_turn) {
 }
 //-----------------------------------------------------------
 socket.on('chcard', function(data) {
-  console.log('chcard '+data.card+ ' data.num_card '+data.num_card);
+  console.log('chcard '+data.card+ ' data.num_card '+JSON.stringify(data.num_card));
   //set_turnswap(data.player_turn);
   //{ num_card: data.dst_num, card: players.my.board[data.dst_num] });
   board[data.num_card].card= data.card;
@@ -39,7 +39,7 @@ socket.on('turnswap', function(data) {
 });
 //-----------------------------------------------------------
 socket.on('addcard', function(data) {
-  console.log('addcard '+data.card+ ' data.num_card '+data.num_card);
+  console.log('addcard '+data.card+ ' data.num_card '+JSON.stringify(data.num_card));
   board[data.num_card].card= data.card;
   board[data.num_card].draw();
 });
@@ -182,14 +182,14 @@ function case_card(left, top, id, numid) {
     ctx.stroke();
 
     ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.cost, 3, 9, ctx)
-    my_draw_text(this.card.title_card, 22, 10, ctx)
+    my_draw_text(this.card.cost, 3, 9, ctx, 'blue')
+    my_draw_text(this.card.title_card, 22, 10, ctx, 'black')
 
     ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.atk, 90, 147, ctx)
+    my_draw_text(this.card.def, 90, 147, ctx, 'green')
     ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.def, 3, 147, ctx);
-    my_draw_text(this.card.text_card, 5, 100, ctx);
+    my_draw_text(this.card.atk, 3, 147, ctx, 'red');
+    my_draw_text(this.card.text_card, 5, 100, ctx, 'black');
   };
   this.clear_card = function() {
     var ctx = this.canvas.getContext("2d");
@@ -200,12 +200,12 @@ function case_card(left, top, id, numid) {
   };
 }
 //-----------------------------------------------------------
-function my_draw_text(text, x, y, context) {
+function my_draw_text(text, x, y, context, color) {
   //display a text in black with a white outline
   context.strokeStyle = 'white';
   context.lineWidth = 1.8;
   context.strokeText(text, x, y);
-  context.fillStyle = 'black';
+  context.fillStyle = color;
   context.fillText(text, x, y);
 }
 //-----------------------------------------------------------

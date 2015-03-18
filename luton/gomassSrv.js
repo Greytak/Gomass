@@ -115,7 +115,7 @@ io.on('connection', function(socket){
       return;
     }
     console.log(' typeof(players.my.board[data.dst_num]) '+typeof(players.my.board[data.dst_num]));
-    console.log(' players.my.board[data.dst_num] '+players.my.board[data.dst_num]);
+    console.log(' players.my.board[data.dst_num] '+JSON.stringify(players.my.board[data.dst_num]));
     // if src in my field and dst in other field : attack
     if (data.src_num>=6 && data.src_num<=9)
     if (data.dst_num>=10 && data.dst_num<=13)
@@ -124,7 +124,10 @@ io.on('connection', function(socket){
       players.my.board[data.dst_num].def -= players.my.board[data.src_num].atk;
       players.my.board[data.src_num].def -= players.my.board[data.dst_num].atk;
       //debugger;
+      console.log('players.my.board[data.src_num].title_card '+players.my.board[data.src_num].title_card);
       console.log('players.my.board[data.src_num].def ' + players.my.board[data.src_num].def + ' players.other.board[data.src_num + 4].def '+ players.other.board[data.src_num + 4].def);
+      console.log('players.my.board[data.dst_num].title_card '+players.my.board[data.src_num].title_card);
+      console.log('players.my.board[data.dst_num].def ' + players.my.board[data.dst_num].def + ' players.other.board[data.dst_num - 4].def '+ players.other.board[data.dst_num - 4].def);
       if (players.my.board[data.dst_num].def <= 0) {
         players.my.board[data.dst_num]= null;
         socket.emit('rmcard', { num_card: data.dst_num });
@@ -134,7 +137,7 @@ io.on('connection', function(socket){
         socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
         socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.dst_num - 4, card: players.my.board[data.dst_num] });
       }
-      return;
+      //return;
       if (players.my.board[data.src_num].def <= 0) {
         players.my.board[data.src_num]= null;
         socket.emit('rmcard', { num_card: data.src_num });
