@@ -34,6 +34,10 @@ socket.on('chcard', function(data) {
 //-----------------------------------------------------------
 socket.on('turnswap', function(data) {
   console.log('turnswap data.player_turn '+data.player_turn);
+  if (typeof(data.num_card) != 'undefined') if (data.num_card<5) {
+    board[data.num_card].card= data.card;
+    board[data.num_card].draw();    
+  }
   set_turnswap(data.player_turn);
 });
 //-----------------------------------------------------------

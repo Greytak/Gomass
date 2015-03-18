@@ -76,15 +76,24 @@ io.on('connection', function(socket){
       if (thegame.player_turn!=socket.id) return;
       var players= determine_players(thegame);
       thegame.player_turn= players.other.socket_id;
+      // draw card from deck if find free space in hand
+      for (var i = 0; i < 4; i++) if (! players.other.board[i]) {
+        players.other.board[i]= new Card(Math.round(Math.random() * 6));
+        break;
+      }
       // send a message to the room socket.game exept the sender
       socket.broadcast.to(data.party_name).emit('turnswap', {
-        player_turn: thegame.player_turn
+        player_turn: thegame.player_turn,
+        num_card: i,
+        card: players.other.board[i]       
       });
       // send message only to the sender
       socket.emit('turnswap', {
         player_turn: thegame.player_turn
       });
     });
+    //  0 1  4   10 11 12 13
+    //  2 3  5    6  7  8  9
     //-----------------------------------------------------------
     function summon(data) {
       var thegame= games[data.party_name];
@@ -123,10 +132,10 @@ io.on('connection', function(socket){
       players.my.board[data.dst_num].def -= players.my.board[data.src_num].atk;
       players.my.board[data.src_num].def -= players.my.board[data.dst_num].atk;
       //debugger;
-      console.log('players.my.board[data.src_num].title_card '+players.my.board[data.src_num].title_card);
+      /*console.log('players.my.board[data.src_num].title_card '+players.my.board[data.src_num].title_card);
       console.log('players.my.board[data.src_num].def ' + players.my.board[data.src_num].def + ' players.other.board[data.src_num + 4].def '+ players.other.board[data.src_num + 4].def);
       console.log('players.my.board[data.dst_num].title_card '+players.my.board[data.src_num].title_card);
-      console.log('players.my.board[data.dst_num].def ' + players.my.board[data.dst_num].def + ' players.other.board[data.dst_num - 4].def '+ players.other.board[data.dst_num - 4].def);
+      console.log('players.my.board[data.dst_num].def ' + players.my.board[data.dst_num].def + ' players.other.board[data.dst_num - 4].def '+ players.other.board[data.dst_num - 4].def);*/
 
       if (players.my.board[data.dst_num].def <= 0) {
         players.my.board[data.dst_num]= null;
@@ -149,6 +158,21 @@ io.on('connection', function(socket){
       }
     }
     //-----------------------------------------------------------
+    function attack_player(data) {
+      var thegame= games[data.party_name];
+      // if it is not your turn : exit
+      if (thegame.player_turn!=socket.id) return;
+      var players= determine_players(thegame);
+      // if source card does not exist : exit
+      if (! players.my.board[data.src_num]) return;
+      console.log('attack : data.src_num= '+data.src_num+' data.dst_num '+data.dst_num+' title '+ players.my.board[data.src_num].title_card);
+      if (! players.my.board[data.dst_num]) return; // if dst empty return (it should never happened)
+
+      players.my.board[data.dst_num].def -= players.my.board[data.src_num].atk;
+      socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
+      socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.dst_num + 1, card: players.my.board[data.dst_num] });
+    }
+    //-----------------------------------------------------------
     socket.on('move_card', function (data) {
       //  0 1  4   10 11 12 13
       //  2 3  5    6  7  8  9
@@ -159,6 +183,9 @@ io.on('connection', function(socket){
       // if src in my field and dst in other field : attack
       if (data.src_num>=6 && data.src_num<=9)
       if (data.dst_num>=10 && data.dst_num<=13) attack(data);
+      // if src in my field and dst in other player : attack_player
+      if (data.src_num>=6 && data.src_num<=9)
+      if (data.dst_num==4) attack_player(data);
     });
   //-----------------------------------------------------------
   socket.on('joinparty', function (data) {
