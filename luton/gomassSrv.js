@@ -70,6 +70,7 @@ function determine_players(thegame) {
 // connection of a socket
 io.on('connection', function(socket){
   console.log('io.on connection');
+  //debugger;
     //-----------------------------------------------------------
     socket.on('turnswap', function (data) {
       var thegame= games[data.party_name];
@@ -85,12 +86,14 @@ io.on('connection', function(socket){
       socket.broadcast.to(data.party_name).emit('turnswap', {
         player_turn: thegame.player_turn,
         num_card: i,
-        card: players.other.board[i]       
+        card: players.other.board[i]
       });
       // send message only to the sender
       socket.emit('turnswap', {
         player_turn: thegame.player_turn
       });
+      // ready all card on other field
+      for (var i = 6; i < 10; i++) if (players.other.board[i]) players.other.board[i].ready= true;
     });
     //  0 1  4   10 11 12 13
     //  2 3  5    6  7  8  9
@@ -126,12 +129,14 @@ io.on('connection', function(socket){
       var players= determine_players(thegame);
       // if source card does not exist : exit
       if (! players.my.board[data.src_num]) return;
+      // if source card is not ready : exit
+      if (! players.my.board[data.src_num].ready) return;
       console.log('attack : data.src_num= '+data.src_num+' data.dst_num '+data.dst_num+' title '+ players.my.board[data.src_num].title_card);
       if (! players.my.board[data.dst_num]) return; // if dst empty return
 
+      players.my.board[data.src_num].ready= false;
       players.my.board[data.dst_num].def -= players.my.board[data.src_num].atk;
       players.my.board[data.src_num].def -= players.my.board[data.dst_num].atk;
-      //debugger;
       /*console.log('players.my.board[data.src_num].title_card '+players.my.board[data.src_num].title_card);
       console.log('players.my.board[data.src_num].def ' + players.my.board[data.src_num].def + ' players.other.board[data.src_num + 4].def '+ players.other.board[data.src_num + 4].def);
       console.log('players.my.board[data.dst_num].title_card '+players.my.board[data.src_num].title_card);
@@ -165,8 +170,14 @@ io.on('connection', function(socket){
       var players= determine_players(thegame);
       // if source card does not exist : exit
       if (! players.my.board[data.src_num]) return;
+      // if source card is not ready : exit
+      if (! players.my.board[data.src_num].ready) return;
       console.log('attack : data.src_num= '+data.src_num+' data.dst_num '+data.dst_num+' title '+ players.my.board[data.src_num].title_card);
       if (! players.my.board[data.dst_num]) return; // if dst empty return (it should never happened)
+
+      players.my.board[data.src_num].ready= false;
+      socket.emit('chcard', { num_card: data.src_num, card: players.my.board[data.src_num] });
+      socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.src_num + 4, card: players.my.board[data.src_num] });
 
       players.my.board[data.dst_num].def -= players.my.board[data.src_num].atk;
       socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
@@ -285,6 +296,7 @@ function Card_model(title_card, text_card, cost, atk, def, image_num) {
 }
 function Card(model_num) {
   this.model_num= model_num;
+  this.ready= false;
   this.title_card= card_models[model_num].title_card;
   this.text_card= card_models[model_num].text_card;
   this.atk= card_models[model_num].atk;  this.def= card_models[model_num].def;

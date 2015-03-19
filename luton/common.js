@@ -17,6 +17,7 @@ function Card_model(title_card, text_card, cost, atk, def, image_num) {
 }
 function Card(model_num) {
   this.model_num= model_num;
+  this.ready= false;
   this.title_card= card_models[model_num].title_card;
   this.text_card= card_models[model_num].text_card;
   this.atk= card_models[model_num].atk;  this.def= card_models[model_num].def;

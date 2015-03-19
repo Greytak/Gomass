@@ -15,14 +15,26 @@ var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
 var src_num = -1;
 //-----------------------------------------------------------
+//  0 1  4   10 11 12 13
+//  2 3  5    6  7  8  9
 function set_turnswap(player_turn) {
   // modify turnswap button
   if (player_turn==socket.id) {
     document.getElementById('turnswap').value= 'end turn';
     document.getElementById('turnswap').disabled= false;
+    // ready all card on my field
+    for (var i = 6; i < 10; i++) if (board[i].card) {
+      board[i].card.ready= true;
+      board[i].draw();
+    }
   } else {
     document.getElementById('turnswap').value= 'other turn';
     document.getElementById('turnswap').disabled= true;
+    // ready all card on other field
+    for (var i = 10; i < 14; i++) if (board[i].card) {
+      board[i].card.ready= true;
+      board[i].draw();
+    }
   }
 }
 //-----------------------------------------------------------
@@ -35,8 +47,9 @@ socket.on('chcard', function(data) {
 socket.on('turnswap', function(data) {
   console.log('turnswap data.player_turn '+data.player_turn);
   if (typeof(data.num_card) != 'undefined') if (data.num_card<5) {
+    console.log('data.card '+JSON.stringify(data.card));
     board[data.num_card].card= data.card;
-    board[data.num_card].draw();    
+    board[data.num_card].draw();
   }
   set_turnswap(data.player_turn);
 });
@@ -53,9 +66,6 @@ socket.on('rmcard', function(data) {
   board[data.num_card].clear_card();
 });
 //-----------------------------------------------------------
-//  client board:
-//  0 1  4   10 11 12 13
-//  2 3  5    6  7  8  9
 // init game display player cards
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
@@ -176,7 +186,8 @@ function case_card(left, top, id, numid) {
     }
   };
   this.draw = function() {
-    this.canvas.style.border = "1px solid red";
+    if (this.card.ready) this.canvas.style.border = "1px solid red";
+    else this.canvas.style.border = "1px solid black";
     var ctx = this.canvas.getContext("2d");
     //console.log('tt '+ this.card.image_num +' dd '+ cardimages[this.card.image_num]);
     ctx.drawImage(cardimages[this.card.image_num], 1, 1);
