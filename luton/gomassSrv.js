@@ -166,6 +166,22 @@ io.on('connection', function(socket){
     }
   }
   //-----------------------------------------------------------
+  function end_game(data) {
+
+    // send a message to the room socket.game exept the sender
+    socket.broadcast.to(data.party_name).emit('endgame', {
+      player_turn: thegame.player_turn,
+      num_card: i,
+      card: players.other.board[i]
+    });
+    // send message only to the sender
+    socket.emit('endgame', {
+      player_turn: thegame.player_turn
+    });
+
+
+  }
+  //-----------------------------------------------------------
   function attack_player(data) {
     var thegame= games[data.party_name];
     // if it is not your turn : exit
@@ -188,7 +204,7 @@ io.on('connection', function(socket){
       players.my.board[data.dst_num]= null;
       socket.emit('rmcard', { num_card: data.dst_num });
       socket.broadcast.to(data.party_name).emit('rmcard', { num_card: data.dst_num + 1 });
-      // end game
+      end_game(data); // end game
     } else {
       socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
       socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.dst_num + 1, card: players.my.board[data.dst_num] });

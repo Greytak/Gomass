@@ -169,7 +169,7 @@ function case_card(left, top, id, numid) {
     // remember canvas clicked in src_num
     if (src_num == -1) {
       src_num= this.numid;
-      console.log('src_num= '+src_num+' title '+ board[src_num].card.title_card);
+      if (board[src_num].card) console.log('src_num= '+src_num+' title '+ board[src_num].card.title_card);
       return;
     }
     // if same canvas empty src_num
