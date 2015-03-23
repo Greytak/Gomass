@@ -46,10 +46,18 @@ socket.on('chcard', function(data) {
 //-----------------------------------------------------------
 socket.on('turnswap', function(data) {
   console.log('turnswap data.player_turn '+data.player_turn);
+  // my turn
   if (typeof(data.num_card) != 'undefined') if (data.num_card<5) {
     console.log('data.card '+JSON.stringify(data.card));
     board[data.num_card].card= data.card;
     board[data.num_card].draw();
+    board[5].card= data.player_card;
+    board[5].draw();
+  }
+  // other turn
+  if (typeof(data.num_card) == 'undefined') {
+    board[4].card= data.player_card;
+    board[4].draw();
   }
   set_turnswap(data.player_turn);
 });
@@ -204,7 +212,7 @@ function case_card(left, top, id, numid) {
     if (this.card.type_card!='player')
       my_draw_text(this.card.atk, 3, 147, ctx, 'red');
     else
-      my_draw_text(this.card.atk+'/'+this.card.atk, 3, 147, ctx, 'red');
+      my_draw_text(this.card.mana+'/'+this.card.current_mana, 3, 147, ctx, 'red');
     my_draw_text(this.card.text_card, 5, 100, ctx, 'black');
   };
   this.clear_card = function() {

@@ -41,6 +41,8 @@ function Game() {
     player2.board[4]= player1.board[5];
     player2.board[5]= new Card(7);
     player1.board[4]= player2.board[5];
+    player1.board[5].mana= player1.board[5].current_mana= 1;
+    player2.board[5].mana= player2.board[5].current_mana= 1;
     for (var i = 0; i < 2; i++)
       player1.board[i]= new Card(Math.round(Math.random() * 6));
     for (var i = 0; i < 3; i++)
@@ -82,15 +84,20 @@ io.on('connection', function(socket){
       players.other.board[i]= new Card(Math.round(Math.random() * 6));
       break;
     }
+    // increment and reload mana
+    players.other.board[5].mana++;
+    players.other.board[5].current_mana= players.other.board[5].mana;
     // send a message to the room socket.game exept the sender
     socket.broadcast.to(data.party_name).emit('turnswap', {
       player_turn: thegame.player_turn,
+      player_card: players.other.board[5],
       num_card: i,
       card: players.other.board[i]
     });
     // send message only to the sender
     socket.emit('turnswap', {
-      player_turn: thegame.player_turn
+      player_turn: thegame.player_turn,
+      player_card: players.other.board[5]
     });
     // ready all card on other field
     for (var i = 6; i < 10; i++) if (players.other.board[i]) players.other.board[i].ready= true;
