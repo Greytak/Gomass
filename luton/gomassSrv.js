@@ -114,17 +114,26 @@ io.on('connection', function(socket){
     if (! players.my.board[data.src_num]) return;
     console.log('summon : data.src_num= '+data.src_num+' data.dst_num '+data.dst_num+' title '+ players.my.board[data.src_num].title_card);
     if (players.my.board[data.dst_num]) rerturn; // if dst not empty return
-
+    // if not enough mana return
+    if (players.my.board[5].current_mana < players.my.board[data.src_num].cost) return;
+    // modify mana
+    players.my.board[5].current_mana-= players.my.board[data.src_num].cost;
+    // modify cards
     players.my.board[data.dst_num]= players.my.board[data.src_num];
     players.other.board[data.dst_num + 4]= players.my.board[data.src_num];
     players.my.board[data.src_num]= null;
+    // emit modification
     socket.broadcast.to(data.party_name).emit('addcard', {
       num_card: data.dst_num + 4,
-      card: players.my.board[data.dst_num]
+      card: players.my.board[data.dst_num],
+      player_numcard: 4,
+      player_card: players.my.board[5]
     });
     socket.emit('addcard', {
       num_card: data.dst_num,
-      card: players.my.board[data.dst_num]
+      card: players.my.board[data.dst_num],
+      player_numcard: 5,
+      player_card: players.my.board[5]
     });
     socket.emit('rmcard', { num_card: data.src_num });
   }

@@ -66,6 +66,9 @@ socket.on('addcard', function(data) {
   console.log('addcard '+data.card+ ' data.num_card '+JSON.stringify(data.num_card));
   board[data.num_card].card= data.card;
   board[data.num_card].draw();
+  // reload player card with modified mana
+  board[data.player_numcard].card= data.player_card;
+  board[data.player_numcard].draw();
 });
 //-----------------------------------------------------------
 socket.on('rmcard', function(data) {
@@ -212,7 +215,7 @@ function case_card(left, top, id, numid) {
     if (this.card.type_card!='player')
       my_draw_text(this.card.atk, 3, 147, ctx, 'red');
     else
-      my_draw_text(this.card.mana+'/'+this.card.current_mana, 3, 147, ctx, 'red');
+      my_draw_text(this.card.current_mana+'/'+this.card.mana, 3, 147, ctx, 'red');
     my_draw_text(this.card.text_card, 5, 100, ctx, 'black');
   };
   this.clear_card = function() {
