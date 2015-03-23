@@ -192,15 +192,19 @@ function case_card(left, top, id, numid) {
     //console.log('tt '+ this.card.image_num +' dd '+ cardimages[this.card.image_num]);
     ctx.drawImage(cardimages[this.card.image_num], 1, 1);
     ctx.stroke();
-
-    ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.cost, 3, 9, ctx, 'blue')
+    if (this.card.type_card!='player') {
+      ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+      my_draw_text(this.card.cost, 3, 9, ctx, 'blue')
+    }
     my_draw_text(this.card.title_card, 22, 10, ctx, 'black')
 
     ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
     my_draw_text(this.card.def, 90, 147, ctx, 'green')
     ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.atk, 3, 147, ctx, 'red');
+    if (this.card.type_card!='player')
+      my_draw_text(this.card.atk, 3, 147, ctx, 'red');
+    else
+      my_draw_text(this.card.atk+'/'+this.card.atk, 3, 147, ctx, 'red');
     my_draw_text(this.card.text_card, 5, 100, ctx, 'black');
   };
   this.clear_card = function() {
