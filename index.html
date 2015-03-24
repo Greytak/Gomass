@@ -206,7 +206,7 @@ function case_card(left, top, id, numid) {
     else this.canvas.style.border = "1px solid black";
     var ctx = this.canvas.getContext("2d");
     //console.log('tt '+ this.card.image_num +' dd '+ cardimages[this.card.image_num]);
-    ctx.drawImage(cardimages[this.card.image_num], 1, 1);
+    ctx.drawImage(cardimages[this.card.image_num], 0, 0);
     ctx.stroke();
     if (this.card.type_card!='player') {
       ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
