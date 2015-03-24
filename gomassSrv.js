@@ -28,7 +28,7 @@ function Player(socket_id) {
 //  2 3  5    6  7  8  9
 function Game() {
   this.init = function() {
-    // random player begins, has the card n°9 and 3 hand card the other n°8 and 4
+    // random player1 begins, has the card n°9 and 3 hand card the other n°8 and 4
     if (Math.random()<.5) {
       var player1= this.player_create;
       var player2= this.player_join;
@@ -182,8 +182,7 @@ io.on('connection', function(socket){
     }
   }
   //-----------------------------------------------------------
-  function end_game(data) {
-
+  /*function end_game(data) {
     // send a message to the room socket.game exept the sender
     socket.broadcast.to(data.party_name).emit('endgame', {
       player_turn: thegame.player_turn,
@@ -194,9 +193,7 @@ io.on('connection', function(socket){
     socket.emit('endgame', {
       player_turn: thegame.player_turn
     });
-
-
-  }
+  }*/
   //-----------------------------------------------------------
   function attack_player(data) {
     var thegame= games[data.party_name];
@@ -220,7 +217,7 @@ io.on('connection', function(socket){
       players.my.board[data.dst_num]= null;
       socket.emit('rmcard', { num_card: data.dst_num });
       socket.broadcast.to(data.party_name).emit('rmcard', { num_card: data.dst_num + 1 });
-      end_game(data); // end game
+      //end_game(data); // end game
     } else {
       socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
       socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.dst_num + 1, card: players.my.board[data.dst_num] });
@@ -245,6 +242,8 @@ io.on('connection', function(socket){
   socket.on('joinparty', function (data) {
     console.log('socket.on joinparty '+data.party_name+ ' id '+ socket.id);
     var thegame= games[data.party_name];
+    // if room contains 2 players return totest
+    if (typeof(thegame.player_join)!='undefined') return;
     thegame.player_join= new Player(socket.id);
     socket.join(data.party_name);
     thegame.init();

@@ -84,7 +84,7 @@ socket.on('joinparty', function(data) {
   // copy all cards
   for (var i=0; i<13; i++) board[i].card= data.board[i];
   // modify and draw players's card
-  board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
+  // board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
   board[5].draw();  board[4].draw();
   set_turnswap(data.player_turn);
   // display hand
@@ -212,7 +212,10 @@ function case_card(left, top, id, numid) {
       ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
       my_draw_text(this.card.cost, 3, 9, ctx, 'blue')
     }
-    my_draw_text(this.card.title_card, 22, 10, ctx, 'black')
+    // hack for player card
+    var title= this.card.title_card;
+    if (numid==4) title= 'other'; if (numid==5) title= 'my';
+    my_draw_text(title, 22, 10, ctx, 'black');
 
     ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
     my_draw_text(this.card.def, 90, 147, ctx, 'green')
