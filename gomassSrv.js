@@ -218,6 +218,8 @@ io.on('connection', function(socket){
       socket.emit('rmcard', { num_card: data.dst_num });
       socket.broadcast.to(data.party_name).emit('rmcard', { num_card: data.dst_num + 1 });
       //end_game(data); // end game
+      thegame= null;
+      games[data.party_name]= null;
     } else {
       socket.emit('chcard', { num_card: data.dst_num, card: players.my.board[data.dst_num] });
       socket.broadcast.to(data.party_name).emit('chcard', { num_card: data.dst_num + 1, card: players.my.board[data.dst_num] });

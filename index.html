@@ -83,7 +83,10 @@ socket.on('joinparty', function(data) {
   party_name= data.party_name;
   other_login= data.other_login;
   // copy all cards
-  for (var i=0; i<13; i++) board[i].card= data.board[i];
+  for (var i=0; i<13; i++) {
+    board[i].clear_card();
+    board[i].card= data.board[i];
+  }
   // modify and draw players's card
   // board[5].card.title_card= 'My';  board[4].card.title_card= 'Other';
   board[5].draw();  board[4].draw();
