@@ -262,6 +262,10 @@ io.on('connection', function(socket){
       board: thegame.player_join.board,
       player_turn: thegame.player_turn
     });
+    // send a message to all socket exept the sender
+    socket.broadcast.emit('removeparty', { party_name: data.party_name });
+    // send the message only to the sender
+    socket.emit('removeparty', { party_name: data.party_name });
   });
   //-----------------------------------------------------------
   socket.on('createparty', function (data) {
@@ -308,10 +312,10 @@ io.on('connection', function(socket){
       login: data.login,
       message: data.message
     });
-    socket.emit('sendall', {
+    /*socket.emit('sendall', {
       login: 'sys',
       message: 'msg before return'
-    });
+    });*/
   });
 //-----------------------------------------------------------
 });
@@ -329,8 +333,8 @@ function create_card() {
   card_models.push(new Card_model('colonel', 'Prepare...', 5, 3, 3, 4, 'minion'));
   card_models.push(new Card_model('marshal', 'Think...', 6, 3, 4, 5, 'minion'));
   card_models.push(new Card_model('general', 'Serve...', 7, 4, 3, 6, 'minion'));
-  card_models.push(new Card_model('player', '', 0, 1, 20, 7, 'player'));
-  card_models.push(new Card_model('player', '', 0, 1, 20, 8, 'player'));
+  card_models.push(new Card_model('player', '', 0, 1, 10, 7, 'player'));
+  card_models.push(new Card_model('player', '', 0, 1, 10, 8, 'player'));
 }
 function Card_model(title_card, text_card, cost, atk, def, image_num, type_card) {
   this.title_card= title_card; this.text_card= text_card; this.cost= cost;

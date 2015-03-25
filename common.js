@@ -8,8 +8,8 @@ function create_card() {
   card_models.push(new Card_model('colonel', 'Prepare...', 5, 3, 3, 4, 'minion'));
   card_models.push(new Card_model('marshal', 'Think...', 6, 3, 4, 5, 'minion'));
   card_models.push(new Card_model('general', 'Serve...', 7, 4, 3, 6, 'minion'));
-  card_models.push(new Card_model('player', '', 0, 1, 20, 7, 'player'));
-  card_models.push(new Card_model('player', '', 0, 1, 20, 8, 'player'));
+  card_models.push(new Card_model('player', '', 0, 1, 10, 7, 'player'));
+  card_models.push(new Card_model('player', '', 0, 1, 10, 8, 'player'));
 }
 function Card_model(title_card, text_card, cost, atk, def, image_num, type_card) {
   this.title_card= title_card; this.text_card= text_card; this.cost= cost;

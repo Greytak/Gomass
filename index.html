@@ -91,6 +91,18 @@ socket.on('joinparty', function(data) {
   for (var i=0; i<4; i++) if (board[i].card) board[i].draw();
 });
 //-----------------------------------------------------------
+// remove this party name from listparties
+socket.on('removeparty', function(data) {
+  var listparties= document.getElementById("listparties");
+  //iterate through each option of the listbox
+  for(var count= listparties.options.length-1; count >= 0; count--) {
+    //if the option is party_name, delete the option
+    if(listparties.options[count].value == data.party_name) {
+      listparties.remove(count);
+    }
+  }
+});
+//-----------------------------------------------------------
 // add party_name to select 'listparties' and select it if you are the creator
 socket.on('createparty', function(data) {
   console.log('createparty '+data.party_name);
@@ -209,7 +221,7 @@ function case_card(left, top, id, numid) {
     ctx.drawImage(cardimages[this.card.image_num], 0, 0);
     ctx.stroke();
     if (this.card.type_card!='player') {
-      ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+      //ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
       my_draw_text(this.card.cost, 3, 9, ctx, 'blue')
     }
     // hack for player card
@@ -217,9 +229,9 @@ function case_card(left, top, id, numid) {
     if (numid==4) title= 'other'; if (numid==5) title= 'my';
     my_draw_text(title, 22, 10, ctx, 'black');
 
-    ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.def, 90, 147, ctx, 'green')
-    ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    //ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
+    my_draw_text(this.card.def, 88, 147, ctx, 'green')
+    //ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
     if (this.card.type_card!='player')
       my_draw_text(this.card.atk, 3, 147, ctx, 'red');
     else
@@ -238,7 +250,7 @@ function case_card(left, top, id, numid) {
 function my_draw_text(text, x, y, context, color) {
   //display a text in black with a white outline
   context.strokeStyle = 'white';
-  context.lineWidth = 1.8;
+  context.lineWidth = 1.9;//1.8;
   context.strokeText(text, x, y);
   context.fillStyle = color;
   context.fillText(text, x, y);
@@ -380,6 +392,7 @@ function create_buttons_party() {
       party_name: document.getElementById('party_name').value,
       login: document.getElementById('login').value
     });
+    //document.getElementById('party_name').value= '';
   };
   document.body.appendChild(element);
   var element = document.createElement("input");
@@ -414,6 +427,7 @@ function create_buttons_party() {
   element.style.top = 334;
   element.onclick = function() {
     var listparties= document.getElementById("listparties");
+    // !!! party_name c déjà une variable globale !!!!
     var party_name= listparties[listparties.selectedIndex].value;
     console.log('joinparty click '+party_name);
     if (party_name!='')
