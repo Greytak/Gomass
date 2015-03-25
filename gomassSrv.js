@@ -19,8 +19,8 @@ create_card(); // list of card models
 //-----------------------------------------------------------
 var games= []; // list of games
 //-----------------------------------------------------------
-function Player(socket_id) {
-  this.socket_id= socket_id;  this.board= [];  this.deck= [];
+function Player(socket_id, login) {
+  this.socket_id= socket_id; this.login= login; this.board= []; this.deck= [];
 }
 //-----------------------------------------------------------
 //  client board:
@@ -244,20 +244,21 @@ io.on('connection', function(socket){
     var thegame= games[data.party_name];
     // if room contains 2 players return totest
     if (typeof(thegame.player_join)!='undefined') return;
-    thegame.player_join= new Player(socket.id);
+    // create player with id and login
+    thegame.player_join= new Player(socket.id, data.login);
     socket.join(data.party_name);
     thegame.init();
     //current console.log('check board[1] player1.board[1]= '+player1.board[1].title_card);
     // send a message to the room socket.game exept the sender
     socket.broadcast.to(data.party_name).emit('joinparty', {
-      login: data.login,
+      other_login: data.login,
       party_name: data.party_name,
       board: thegame.player_create.board,
       player_turn: thegame.player_turn
     });
     // send joinparty only to the sender
     socket.emit('joinparty', {
-      login: data.login,
+      other_login: thegame.player_create.login,
       party_name: data.party_name,
       board: thegame.player_join.board,
       player_turn: thegame.player_turn
@@ -272,7 +273,7 @@ io.on('connection', function(socket){
     console.log('socket.on createparty '+data.party_name+ ' id '+ socket.id);
     games[data.party_name]= new Game();
     var thegame= games[data.party_name];
-    thegame.player_create= new Player(socket.id);
+    thegame.player_create= new Player(socket.id, data.login);
     socket.join(data.party_name);
     // send createparty to all socket exept the sender
     socket.broadcast.emit('createparty', {

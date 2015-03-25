@@ -81,6 +81,7 @@ socket.on('rmcard', function(data) {
 socket.on('joinparty', function(data) {
   console.log('joinparty '+data.party_name);
   party_name= data.party_name;
+  other_login= data.other_login;
   // copy all cards
   for (var i=0; i<13; i++) board[i].card= data.board[i];
   // modify and draw players's card
@@ -222,21 +223,23 @@ function case_card(left, top, id, numid) {
     ctx.stroke();
     if (this.card.type_card!='player') {
       //ctx.rect(0, 0, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-      my_draw_text(this.card.cost, 3, 9, ctx, 'blue')
+      my_draw_text(this.card.cost, 3, 12, ctx, 'blue', '14')
     }
     // hack for player card
     var title= this.card.title_card;
-    if (numid==4) title= 'other'; if (numid==5) title= 'my';
-    my_draw_text(title, 22, 10, ctx, 'black');
+    //if (numid==4) title= 'other'; if (numid==5) title= 'my';
+    if (numid==4) title= other_login;
+    if (numid==5) title= document.getElementById('login').value;
+    my_draw_text(title, 22, 12, ctx, 'black', '11');
 
     //ctx.rect(88, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
-    my_draw_text(this.card.def, 88, 147, ctx, 'green')
+    my_draw_text(this.card.def, 80, 147, ctx, 'green', '14')
     //ctx.rect(0, 138, 11, 11);  ctx.strokeStyle = 'black';  ctx.stroke();
     if (this.card.type_card!='player')
-      my_draw_text(this.card.atk, 3, 147, ctx, 'red');
+      my_draw_text(this.card.atk, 3, 147, ctx, 'red', '14');
     else
-      my_draw_text(this.card.current_mana+'/'+this.card.mana, 3, 147, ctx, 'red');
-    my_draw_text(this.card.text_card, 5, 100, ctx, 'black');
+      my_draw_text(this.card.current_mana+'/'+this.card.mana, 3, 147, ctx, 'red', '14');
+    my_draw_text(this.card.text_card, 5, 100, ctx, 'black', '11');
   };
   this.clear_card = function() {
     var ctx = this.canvas.getContext("2d");
@@ -247,10 +250,11 @@ function case_card(left, top, id, numid) {
   };
 }
 //-----------------------------------------------------------
-function my_draw_text(text, x, y, context, color) {
+function my_draw_text(text, x, y, context, color, size) {
   //display a text in black with a white outline
+  context.font = size + "px Verdana";
   context.strokeStyle = 'white';
-  context.lineWidth = 1.9;//1.8;
+  context.lineWidth = 4;//1.9;
   context.strokeText(text, x, y);
   context.fillStyle = color;
   context.fillText(text, x, y);
@@ -428,11 +432,11 @@ function create_buttons_party() {
   element.onclick = function() {
     var listparties= document.getElementById("listparties");
     // !!! party_name c déjà une variable globale !!!!
-    var party_name= listparties[listparties.selectedIndex].value;
-    console.log('joinparty click '+party_name);
-    if (party_name!='')
+    var party_2join= listparties[listparties.selectedIndex].value;
+    console.log('joinparty click '+party_2join);
+    if (party_2join!='')
       socket.emit('joinparty', {
-        party_name: party_name,
+        party_name: party_2join,
         login: document.getElementById('login').value
       });
   };
