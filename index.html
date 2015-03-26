@@ -14,6 +14,7 @@ preloadimages();
 var socket = io.connect('http://localhost:3000');
 //-----------------------------------------------------------
 var src_num = -1;
+party_name = '';
 //-----------------------------------------------------------
 //  0 1  4   10 11 12 13
 //  2 3  5    6  7  8  9
@@ -75,6 +76,8 @@ socket.on('rmcard', function(data) {
   console.log('rmcard '+data.num_card);
   board[data.num_card].card= null;
   board[data.num_card].clear_card();
+  // end of party
+  if (data.num_card==4 || data.num_card==5) party_name= '';
 });
 //-----------------------------------------------------------
 // init game display player cards
@@ -315,7 +318,8 @@ function create_chat() {
   element.style.top = 366;
   element.onclick = function() {
     // ask server to send a chat message to the room
-    socket.emit('sendroom', {
+    if (party_name!='') socket.emit('sendroom', {
+        party_name: party_name,
         message: document.getElementById('messagechat').value,
         login: document.getElementById('login').value
     });
@@ -371,6 +375,7 @@ function create_buttons() {
   element.disabled = true;
   element.value = "reset";
   element.id = "resetgame";
+  element.style.visibility = "hidden";
   element.style.position = "absolute";
   element.style.left = 3;
   element.style.top = 334;
@@ -414,6 +419,7 @@ function create_buttons_party() {
   element.disabled = true;
   element.value = "quit";
   element.id = "quitparty";
+  element.style.visibility = "hidden";
   element.style.position = "absolute";
   element.style.left = 360;
   element.style.top = 334;

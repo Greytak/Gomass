@@ -291,8 +291,8 @@ io.on('connection', function(socket){
   //-----------------------------------------------------------
   socket.on('sendroom', function (data) {
     console.log('socket.on sendroom');
-    // send a message to the room socket.game exept the sender
-    socket.broadcast.to(socket.game).emit('sendroom', {
+    // send a message to the room data.party_name exept the sender
+    socket.broadcast.to(data.party_name ).emit('sendroom', {
       login: data.login,
       message: data.message
     });
