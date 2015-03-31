@@ -77,7 +77,10 @@ socket.on('rmcard', function(data) {
   board[data.num_card].card= null;
   board[data.num_card].clear_card();
   // end of party
-  if (data.num_card==4 || data.num_card==5) party_name= '';
+  if (data.num_card==4 || data.num_card==5) {
+    party_name= '';
+    document.getElementById('party_name').value= '';
+  }
 });
 //-----------------------------------------------------------
 // init game display player cards
@@ -86,7 +89,7 @@ socket.on('joinparty', function(data) {
   party_name= data.party_name;
   other_login= data.other_login;
   // copy all cards
-  for (var i=0; i<13; i++) {
+  for (var i=0; i<14; i++) {
     board[i].clear_card();
     board[i].card= data.board[i];
   }
